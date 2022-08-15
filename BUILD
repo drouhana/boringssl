@@ -161,7 +161,10 @@ cc_library(
     srcs = crypto_sources + crypto_internal_headers + crypto_sources_asm,
     hdrs = crypto_headers + fips_fragments,
     copts = boringssl_copts_c11,
-    includes = ["src/include"],
+    includes = [
+        "src/include",
+        "src/oqs/include/oqs",
+        ],
     linkopts = select({
         # Android supports pthreads, but does not provide a libpthread
         # to link against.
@@ -179,7 +182,10 @@ cc_library(
     srcs = ssl_sources + ssl_internal_headers + oqs_sources + oqs_internal_headers,
     hdrs = ssl_headers + oqs_headers,
     copts = boringssl_copts_cxx,
-    includes = ["src/include"],
+    includes = [
+        "src/include",
+        "src/oqs/include/oqs",
+        ],
     visibility = ["//visibility:public"],
     linkstatic = True,
     deps = [
