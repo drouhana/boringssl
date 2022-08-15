@@ -923,7 +923,7 @@ def main(platforms):
                                 SSLHeaderFiles)
 
   oqs_h_files = FindHeaderFiles(os.path.join('src', 'oqs', 'include', 'oqs'),
-                                SSLHeaderFiles)
+                                NoTests)
 
   def NotSSLHeaderFiles(path, filename, is_dir):
     return not SSLHeaderFiles(path, filename, is_dir)

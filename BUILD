@@ -176,8 +176,8 @@ cc_library(
 
 cc_library(
     name = "ssl",
-    srcs = ssl_sources + ssl_internal_headers,
-    hdrs = ssl_headers,
+    srcs = ssl_sources + ssl_internal_headers + oqs_sources + oqs_internal_headers,
+    hdrs = ssl_headers + oqs_headers,
     copts = boringssl_copts_cxx,
     includes = ["src/include"],
     visibility = ["//visibility:public"],
