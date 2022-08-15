@@ -1,4 +1,5 @@
 include_directories(../include)
+include_directories(${LIBOQS_DIR}/include)
 
 add_library(
   ssl
@@ -10,6 +11,8 @@ add_library(
   d1_srtp.cc
   dtls_method.cc
   dtls_record.cc
+  encrypted_client_hello.cc
+  extensions.cc
   handoff.cc
   handshake.cc
   handshake_client.cc
@@ -32,7 +35,6 @@ add_library(
   ssl_versions.cc
   ssl_x509.cc
   t1_enc.cc
-  t1_lib.cc
   tls_method.cc
   tls_record.cc
   tls13_both.cc
@@ -43,13 +45,14 @@ add_library(
 
 add_dependencies(ssl global_target)
 
-target_link_libraries(ssl crypto)
+target_link_libraries(ssl crypto ${LIBOQS})
 
 add_executable(
   ssl_test
 
   span_test.cc
   ssl_test.cc
+  ssl_c_test.c
 
   $<TARGET_OBJECTS:boringssl_gtest_main>
 )

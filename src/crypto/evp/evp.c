@@ -71,6 +71,15 @@
 #include "../internal.h"
 
 
+// Node depends on |EVP_R_NOT_XOF_OR_INVALID_LENGTH|.
+//
+// TODO(davidben): Fix Node to not touch the error queue itself and remove this.
+OPENSSL_DECLARE_ERROR_REASON(EVP, NOT_XOF_OR_INVALID_LENGTH)
+
+// The HPKE module uses the EVP error namespace, but it lives in another
+// directory.
+OPENSSL_DECLARE_ERROR_REASON(EVP, EMPTY_PSK)
+
 EVP_PKEY *EVP_PKEY_new(void) {
   EVP_PKEY *ret;
 
@@ -169,7 +178,10 @@ int EVP_PKEY_missing_parameters(const EVP_PKEY *pkey) {
   return 0;
 }
 
-int EVP_PKEY_size(const EVP_PKEY *pkey) {
+// OQS note: We've changed the return type
+// from "int" to "size_t" to allow for PQ
+// algorithms with large signatures.
+size_t EVP_PKEY_size(const EVP_PKEY *pkey) {
   if (pkey && pkey->ameth && pkey->ameth->pkey_size) {
     return pkey->ameth->pkey_size(pkey);
   }
@@ -200,6 +212,128 @@ static const EVP_PKEY_ASN1_METHOD *evp_pkey_asn1_find(int nid) {
       return &dsa_asn1_meth;
     case EVP_PKEY_ED25519:
       return &ed25519_asn1_meth;
+    case EVP_PKEY_X25519:
+      return &x25519_asn1_meth;
+///// OQS_TEMPLATE_FRAGMENT_PKEY_TO_ASN1_METH_START
+    case EVP_PKEY_DILITHIUM2:
+      return &dilithium2_asn1_meth;
+    case EVP_PKEY_DILITHIUM3:
+      return &dilithium3_asn1_meth;
+    case EVP_PKEY_DILITHIUM5:
+      return &dilithium5_asn1_meth;
+    case EVP_PKEY_DILITHIUM2_AES:
+      return &dilithium2_aes_asn1_meth;
+    case EVP_PKEY_DILITHIUM3_AES:
+      return &dilithium3_aes_asn1_meth;
+    case EVP_PKEY_DILITHIUM5_AES:
+      return &dilithium5_aes_asn1_meth;
+    case EVP_PKEY_FALCON512:
+      return &falcon512_asn1_meth;
+    case EVP_PKEY_FALCON1024:
+      return &falcon1024_asn1_meth;
+    case EVP_PKEY_PICNICL1FS:
+      return &picnicl1fs_asn1_meth;
+    case EVP_PKEY_PICNICL1UR:
+      return &picnicl1ur_asn1_meth;
+    case EVP_PKEY_PICNICL1FULL:
+      return &picnicl1full_asn1_meth;
+    case EVP_PKEY_PICNIC3L1:
+      return &picnic3l1_asn1_meth;
+    case EVP_PKEY_PICNIC3L3:
+      return &picnic3l3_asn1_meth;
+    case EVP_PKEY_PICNIC3L5:
+      return &picnic3l5_asn1_meth;
+    case EVP_PKEY_RAINBOWICLASSIC:
+      return &rainbowIclassic_asn1_meth;
+    case EVP_PKEY_RAINBOWICIRCUMZENITHAL:
+      return &rainbowIcircumzenithal_asn1_meth;
+    case EVP_PKEY_RAINBOWICOMPRESSED:
+      return &rainbowIcompressed_asn1_meth;
+    case EVP_PKEY_RAINBOWIIICLASSIC:
+      return &rainbowIIIclassic_asn1_meth;
+    case EVP_PKEY_RAINBOWIIICIRCUMZENITHAL:
+      return &rainbowIIIcircumzenithal_asn1_meth;
+    case EVP_PKEY_RAINBOWIIICOMPRESSED:
+      return &rainbowIIIcompressed_asn1_meth;
+    case EVP_PKEY_RAINBOWVCLASSIC:
+      return &rainbowVclassic_asn1_meth;
+    case EVP_PKEY_RAINBOWVCIRCUMZENITHAL:
+      return &rainbowVcircumzenithal_asn1_meth;
+    case EVP_PKEY_RAINBOWVCOMPRESSED:
+      return &rainbowVcompressed_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA128FROBUST:
+      return &sphincsharaka128frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA128FSIMPLE:
+      return &sphincsharaka128fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA128SROBUST:
+      return &sphincsharaka128srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA128SSIMPLE:
+      return &sphincsharaka128ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA192FROBUST:
+      return &sphincsharaka192frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA192FSIMPLE:
+      return &sphincsharaka192fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA192SROBUST:
+      return &sphincsharaka192srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA192SSIMPLE:
+      return &sphincsharaka192ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA256FROBUST:
+      return &sphincsharaka256frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA256FSIMPLE:
+      return &sphincsharaka256fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA256SROBUST:
+      return &sphincsharaka256srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSHARAKA256SSIMPLE:
+      return &sphincsharaka256ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256128FROBUST:
+      return &sphincssha256128frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256128FSIMPLE:
+      return &sphincssha256128fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256128SROBUST:
+      return &sphincssha256128srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256128SSIMPLE:
+      return &sphincssha256128ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256192FROBUST:
+      return &sphincssha256192frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256192FSIMPLE:
+      return &sphincssha256192fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256192SROBUST:
+      return &sphincssha256192srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256192SSIMPLE:
+      return &sphincssha256192ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256256FROBUST:
+      return &sphincssha256256frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256256FSIMPLE:
+      return &sphincssha256256fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256256SROBUST:
+      return &sphincssha256256srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHA256256SSIMPLE:
+      return &sphincssha256256ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256128FROBUST:
+      return &sphincsshake256128frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256128FSIMPLE:
+      return &sphincsshake256128fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256128SROBUST:
+      return &sphincsshake256128srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256128SSIMPLE:
+      return &sphincsshake256128ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256192FROBUST:
+      return &sphincsshake256192frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256192FSIMPLE:
+      return &sphincsshake256192fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256192SROBUST:
+      return &sphincsshake256192srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256192SSIMPLE:
+      return &sphincsshake256192ssimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256256FROBUST:
+      return &sphincsshake256256frobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256256FSIMPLE:
+      return &sphincsshake256256fsimple_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256256SROBUST:
+      return &sphincsshake256256srobust_asn1_meth;
+    case EVP_PKEY_SPHINCSSHAKE256256SSIMPLE:
+      return &sphincsshake256256ssimple_asn1_meth;
+///// OQS_TEMPLATE_FRAGMENT_PKEY_TO_ASN1_METH_END
     default:
       return NULL;
   }
@@ -330,7 +464,73 @@ int EVP_PKEY_set_type(EVP_PKEY *pkey, int type) {
   return 1;
 }
 
+EVP_PKEY *EVP_PKEY_new_raw_private_key(int type, ENGINE *unused,
+                                       const uint8_t *in, size_t len) {
+  EVP_PKEY *ret = EVP_PKEY_new();
+  if (ret == NULL ||
+      !EVP_PKEY_set_type(ret, type)) {
+    goto err;
+  }
 
+  if (ret->ameth->set_priv_raw == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+    goto err;
+  }
+
+  if (!ret->ameth->set_priv_raw(ret, in, len)) {
+    goto err;
+  }
+
+  return ret;
+
+err:
+  EVP_PKEY_free(ret);
+  return NULL;
+}
+
+EVP_PKEY *EVP_PKEY_new_raw_public_key(int type, ENGINE *unused,
+                                      const uint8_t *in, size_t len) {
+  EVP_PKEY *ret = EVP_PKEY_new();
+  if (ret == NULL ||
+      !EVP_PKEY_set_type(ret, type)) {
+    goto err;
+  }
+
+  if (ret->ameth->set_pub_raw == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+    goto err;
+  }
+
+  if (!ret->ameth->set_pub_raw(ret, in, len)) {
+    goto err;
+  }
+
+  return ret;
+
+err:
+  EVP_PKEY_free(ret);
+  return NULL;
+}
+
+int EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey, uint8_t *out,
+                                 size_t *out_len) {
+  if (pkey->ameth->get_priv_raw == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+    return 0;
+  }
+
+  return pkey->ameth->get_priv_raw(pkey, out, out_len);
+}
+
+int EVP_PKEY_get_raw_public_key(const EVP_PKEY *pkey, uint8_t *out,
+                                size_t *out_len) {
+  if (pkey->ameth->get_pub_raw == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+    return 0;
+  }
+
+  return pkey->ameth->get_pub_raw(pkey, out, out_len);
+}
 
 int EVP_PKEY_cmp_parameters(const EVP_PKEY *a, const EVP_PKEY *b) {
   if (a->type != b->type) {
@@ -352,6 +552,15 @@ int EVP_PKEY_CTX_get_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD **out_md) {
                            0, (void *)out_md);
 }
 
+void *EVP_PKEY_get0(const EVP_PKEY *pkey) {
+  // Node references, but never calls this function, so for now we return NULL.
+  // If other projects require complete support, call |EVP_PKEY_get0_RSA|, etc.,
+  // rather than reading |pkey->pkey.ptr| directly. This avoids problems if our
+  // internal representation does not match the type the caller expects from
+  // OpenSSL.
+  return NULL;
+}
+
 void OpenSSL_add_all_algorithms(void) {}
 
 void OPENSSL_add_all_algorithms_conf(void) {}
@@ -361,3 +570,10 @@ void OpenSSL_add_all_ciphers(void) {}
 void OpenSSL_add_all_digests(void) {}
 
 void EVP_cleanup(void) {}
+
+int EVP_PKEY_base_id(const EVP_PKEY *pkey) {
+  // OpenSSL has two notions of key type because it supports multiple OIDs for
+  // the same algorithm: NID_rsa vs NID_rsaEncryption and five distinct spelling
+  // of DSA. We do not support these, so the base ID is simply the ID.
+  return EVP_PKEY_id(pkey);
+}

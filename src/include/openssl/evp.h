@@ -59,6 +59,7 @@
 
 #include <openssl/base.h>
 
+#include <openssl/evp_errors.h>
 #include <openssl/thread.h>
 
 // OpenSSL included digest and cipher functions in this header so we include
@@ -124,7 +125,8 @@ OPENSSL_EXPORT int EVP_PKEY_missing_parameters(const EVP_PKEY *pkey);
 // |pkey|. For an RSA key, this returns the number of bytes needed to represent
 // the modulus. For an EC key, this returns the maximum size of a DER-encoded
 // ECDSA signature.
-OPENSSL_EXPORT int EVP_PKEY_size(const EVP_PKEY *pkey);
+// OQS note: We've changed the return type from "int" to "size_t" to allow for PQ algorithms with large signatures.
+OPENSSL_EXPORT size_t EVP_PKEY_size(const EVP_PKEY *pkey);
 
 // EVP_PKEY_bits returns the "size", in bits, of |pkey|. For an RSA key, this
 // returns the bit length of the modulus. For an EC key, this returns the bit
@@ -170,22 +172,178 @@ OPENSSL_EXPORT int EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key);
 OPENSSL_EXPORT EC_KEY *EVP_PKEY_get0_EC_KEY(const EVP_PKEY *pkey);
 OPENSSL_EXPORT EC_KEY *EVP_PKEY_get1_EC_KEY(const EVP_PKEY *pkey);
 
-// EVP_PKEY_new_ed25519_public returns a newly allocated |EVP_PKEY| wrapping an
-// Ed25519 public key, or NULL on allocation error.
-OPENSSL_EXPORT EVP_PKEY *EVP_PKEY_new_ed25519_public(
-    const uint8_t public_key[32]);
-
-// EVP_PKEY_new_ed25519_private returns a newly allocated |EVP_PKEY| wrapping an
-// Ed25519 private key, or NULL on allocation error.
-OPENSSL_EXPORT EVP_PKEY *EVP_PKEY_new_ed25519_private(
-    const uint8_t private_key[64]);
-
 #define EVP_PKEY_NONE NID_undef
 #define EVP_PKEY_RSA NID_rsaEncryption
 #define EVP_PKEY_RSA_PSS NID_rsassaPss
 #define EVP_PKEY_DSA NID_dsa
 #define EVP_PKEY_EC NID_X9_62_id_ecPublicKey
 #define EVP_PKEY_ED25519 NID_ED25519
+#define EVP_PKEY_X25519 NID_X25519
+///// OQS_TEMPLATE_FRAGMENT_DEFINE_EVP_PKEYS_START
+#define EVP_PKEY_DILITHIUM2 NID_dilithium2
+#define EVP_PKEY_DILITHIUM3 NID_dilithium3
+#define EVP_PKEY_DILITHIUM5 NID_dilithium5
+#define EVP_PKEY_DILITHIUM2_AES NID_dilithium2_aes
+#define EVP_PKEY_DILITHIUM3_AES NID_dilithium3_aes
+#define EVP_PKEY_DILITHIUM5_AES NID_dilithium5_aes
+#define EVP_PKEY_FALCON512 NID_falcon512
+#define EVP_PKEY_FALCON1024 NID_falcon1024
+#define EVP_PKEY_PICNICL1FS NID_picnicl1fs
+#define EVP_PKEY_PICNICL1UR NID_picnicl1ur
+#define EVP_PKEY_PICNICL1FULL NID_picnicl1full
+#define EVP_PKEY_PICNIC3L1 NID_picnic3l1
+#define EVP_PKEY_PICNIC3L3 NID_picnic3l3
+#define EVP_PKEY_PICNIC3L5 NID_picnic3l5
+#define EVP_PKEY_RAINBOWICLASSIC NID_rainbowIclassic
+#define EVP_PKEY_RAINBOWICIRCUMZENITHAL NID_rainbowIcircumzenithal
+#define EVP_PKEY_RAINBOWICOMPRESSED NID_rainbowIcompressed
+#define EVP_PKEY_RAINBOWIIICLASSIC NID_rainbowIIIclassic
+#define EVP_PKEY_RAINBOWIIICIRCUMZENITHAL NID_rainbowIIIcircumzenithal
+#define EVP_PKEY_RAINBOWIIICOMPRESSED NID_rainbowIIIcompressed
+#define EVP_PKEY_RAINBOWVCLASSIC NID_rainbowVclassic
+#define EVP_PKEY_RAINBOWVCIRCUMZENITHAL NID_rainbowVcircumzenithal
+#define EVP_PKEY_RAINBOWVCOMPRESSED NID_rainbowVcompressed
+#define EVP_PKEY_SPHINCSHARAKA128FROBUST NID_sphincsharaka128frobust
+#define EVP_PKEY_SPHINCSHARAKA128FSIMPLE NID_sphincsharaka128fsimple
+#define EVP_PKEY_SPHINCSHARAKA128SROBUST NID_sphincsharaka128srobust
+#define EVP_PKEY_SPHINCSHARAKA128SSIMPLE NID_sphincsharaka128ssimple
+#define EVP_PKEY_SPHINCSHARAKA192FROBUST NID_sphincsharaka192frobust
+#define EVP_PKEY_SPHINCSHARAKA192FSIMPLE NID_sphincsharaka192fsimple
+#define EVP_PKEY_SPHINCSHARAKA192SROBUST NID_sphincsharaka192srobust
+#define EVP_PKEY_SPHINCSHARAKA192SSIMPLE NID_sphincsharaka192ssimple
+#define EVP_PKEY_SPHINCSHARAKA256FROBUST NID_sphincsharaka256frobust
+#define EVP_PKEY_SPHINCSHARAKA256FSIMPLE NID_sphincsharaka256fsimple
+#define EVP_PKEY_SPHINCSHARAKA256SROBUST NID_sphincsharaka256srobust
+#define EVP_PKEY_SPHINCSHARAKA256SSIMPLE NID_sphincsharaka256ssimple
+#define EVP_PKEY_SPHINCSSHA256128FROBUST NID_sphincssha256128frobust
+#define EVP_PKEY_SPHINCSSHA256128FSIMPLE NID_sphincssha256128fsimple
+#define EVP_PKEY_SPHINCSSHA256128SROBUST NID_sphincssha256128srobust
+#define EVP_PKEY_SPHINCSSHA256128SSIMPLE NID_sphincssha256128ssimple
+#define EVP_PKEY_SPHINCSSHA256192FROBUST NID_sphincssha256192frobust
+#define EVP_PKEY_SPHINCSSHA256192FSIMPLE NID_sphincssha256192fsimple
+#define EVP_PKEY_SPHINCSSHA256192SROBUST NID_sphincssha256192srobust
+#define EVP_PKEY_SPHINCSSHA256192SSIMPLE NID_sphincssha256192ssimple
+#define EVP_PKEY_SPHINCSSHA256256FROBUST NID_sphincssha256256frobust
+#define EVP_PKEY_SPHINCSSHA256256FSIMPLE NID_sphincssha256256fsimple
+#define EVP_PKEY_SPHINCSSHA256256SROBUST NID_sphincssha256256srobust
+#define EVP_PKEY_SPHINCSSHA256256SSIMPLE NID_sphincssha256256ssimple
+#define EVP_PKEY_SPHINCSSHAKE256128FROBUST NID_sphincsshake256128frobust
+#define EVP_PKEY_SPHINCSSHAKE256128FSIMPLE NID_sphincsshake256128fsimple
+#define EVP_PKEY_SPHINCSSHAKE256128SROBUST NID_sphincsshake256128srobust
+#define EVP_PKEY_SPHINCSSHAKE256128SSIMPLE NID_sphincsshake256128ssimple
+#define EVP_PKEY_SPHINCSSHAKE256192FROBUST NID_sphincsshake256192frobust
+#define EVP_PKEY_SPHINCSSHAKE256192FSIMPLE NID_sphincsshake256192fsimple
+#define EVP_PKEY_SPHINCSSHAKE256192SROBUST NID_sphincsshake256192srobust
+#define EVP_PKEY_SPHINCSSHAKE256192SSIMPLE NID_sphincsshake256192ssimple
+#define EVP_PKEY_SPHINCSSHAKE256256FROBUST NID_sphincsshake256256frobust
+#define EVP_PKEY_SPHINCSSHAKE256256FSIMPLE NID_sphincsshake256256fsimple
+#define EVP_PKEY_SPHINCSSHAKE256256SROBUST NID_sphincsshake256256srobust
+#define EVP_PKEY_SPHINCSSHAKE256256SSIMPLE NID_sphincsshake256256ssimple
+
+#define IS_OQS_PKEY(pkey_id) ( \
+   (pkey_id == NID_dilithium2) || \
+   (pkey_id == NID_dilithium3) || \
+   (pkey_id == NID_dilithium5) || \
+   (pkey_id == NID_dilithium2_aes) || \
+   (pkey_id == NID_dilithium3_aes) || \
+   (pkey_id == NID_dilithium5_aes) || \
+   (pkey_id == NID_falcon512) || \
+   (pkey_id == NID_falcon1024) || \
+   (pkey_id == NID_picnicl1fs) || \
+   (pkey_id == NID_picnicl1ur) || \
+   (pkey_id == NID_picnicl1full) || \
+   (pkey_id == NID_picnic3l1) || \
+   (pkey_id == NID_picnic3l3) || \
+   (pkey_id == NID_picnic3l5) || \
+   (pkey_id == NID_rainbowIclassic) || \
+   (pkey_id == NID_rainbowIcircumzenithal) || \
+   (pkey_id == NID_rainbowIcompressed) || \
+   (pkey_id == NID_rainbowIIIclassic) || \
+   (pkey_id == NID_rainbowIIIcircumzenithal) || \
+   (pkey_id == NID_rainbowIIIcompressed) || \
+   (pkey_id == NID_rainbowVclassic) || \
+   (pkey_id == NID_rainbowVcircumzenithal) || \
+   (pkey_id == NID_rainbowVcompressed) || \
+   (pkey_id == NID_sphincsharaka128frobust) || \
+   (pkey_id == NID_sphincsharaka128fsimple) || \
+   (pkey_id == NID_sphincsharaka128srobust) || \
+   (pkey_id == NID_sphincsharaka128ssimple) || \
+   (pkey_id == NID_sphincsharaka192frobust) || \
+   (pkey_id == NID_sphincsharaka192fsimple) || \
+   (pkey_id == NID_sphincsharaka192srobust) || \
+   (pkey_id == NID_sphincsharaka192ssimple) || \
+   (pkey_id == NID_sphincsharaka256frobust) || \
+   (pkey_id == NID_sphincsharaka256fsimple) || \
+   (pkey_id == NID_sphincsharaka256srobust) || \
+   (pkey_id == NID_sphincsharaka256ssimple) || \
+   (pkey_id == NID_sphincssha256128frobust) || \
+   (pkey_id == NID_sphincssha256128fsimple) || \
+   (pkey_id == NID_sphincssha256128srobust) || \
+   (pkey_id == NID_sphincssha256128ssimple) || \
+   (pkey_id == NID_sphincssha256192frobust) || \
+   (pkey_id == NID_sphincssha256192fsimple) || \
+   (pkey_id == NID_sphincssha256192srobust) || \
+   (pkey_id == NID_sphincssha256192ssimple) || \
+   (pkey_id == NID_sphincssha256256frobust) || \
+   (pkey_id == NID_sphincssha256256fsimple) || \
+   (pkey_id == NID_sphincssha256256srobust) || \
+   (pkey_id == NID_sphincssha256256ssimple) || \
+   (pkey_id == NID_sphincsshake256128frobust) || \
+   (pkey_id == NID_sphincsshake256128fsimple) || \
+   (pkey_id == NID_sphincsshake256128srobust) || \
+   (pkey_id == NID_sphincsshake256128ssimple) || \
+   (pkey_id == NID_sphincsshake256192frobust) || \
+   (pkey_id == NID_sphincsshake256192fsimple) || \
+   (pkey_id == NID_sphincsshake256192srobust) || \
+   (pkey_id == NID_sphincsshake256192ssimple) || \
+   (pkey_id == NID_sphincsshake256256frobust) || \
+   (pkey_id == NID_sphincsshake256256fsimple) || \
+   (pkey_id == NID_sphincsshake256256srobust) || \
+   (pkey_id == NID_sphincsshake256256ssimple) || \
+   (pkey_id == NID_frodo640aes) || \
+   (pkey_id == NID_frodo640shake) || \
+   (pkey_id == NID_frodo976aes) || \
+   (pkey_id == NID_frodo976shake) || \
+   (pkey_id == NID_frodo1344aes) || \
+   (pkey_id == NID_frodo1344shake) || \
+   (pkey_id == NID_bikel1) || \
+   (pkey_id == NID_bikel3) || \
+   (pkey_id == NID_kyber512) || \
+   (pkey_id == NID_kyber768) || \
+   (pkey_id == NID_kyber1024) || \
+   (pkey_id == NID_ntru_hps2048509) || \
+   (pkey_id == NID_ntru_hps2048677) || \
+   (pkey_id == NID_ntru_hps4096821) || \
+   (pkey_id == NID_ntru_hps40961229) || \
+   (pkey_id == NID_ntru_hrss701) || \
+   (pkey_id == NID_ntru_hrss1373) || \
+   (pkey_id == NID_lightsaber) || \
+   (pkey_id == NID_saber) || \
+   (pkey_id == NID_firesaber) || \
+   (pkey_id == NID_sidhp434) || \
+   (pkey_id == NID_sidhp503) || \
+   (pkey_id == NID_sidhp610) || \
+   (pkey_id == NID_sidhp751) || \
+   (pkey_id == NID_sikep434) || \
+   (pkey_id == NID_sikep503) || \
+   (pkey_id == NID_sikep610) || \
+   (pkey_id == NID_sikep751) || \
+   (pkey_id == NID_kyber90s512) || \
+   (pkey_id == NID_kyber90s768) || \
+   (pkey_id == NID_kyber90s1024) || \
+   (pkey_id == NID_hqc128) || \
+   (pkey_id == NID_hqc192) || \
+   (pkey_id == NID_hqc256) || \
+   (pkey_id == NID_ntrulpr653) || \
+   (pkey_id == NID_ntrulpr761) || \
+   (pkey_id == NID_ntrulpr857) || \
+   (pkey_id == NID_ntrulpr1277) || \
+   (pkey_id == NID_sntrup653) || \
+   (pkey_id == NID_sntrup761) || \
+   (pkey_id == NID_sntrup857) || \
+   (pkey_id == NID_sntrup1277) || \
+0 )
+///// OQS_TEMPLATE_FRAGMENT_DEFINE_EVP_PKEYS_END
 
 // EVP_PKEY_assign sets the underlying key of |pkey| to |key|, which must be of
 // the given type. It returns one if successful or zero if the |type| argument
@@ -228,7 +386,9 @@ OPENSSL_EXPORT int EVP_marshal_public_key(CBB *cbb, const EVP_PKEY *key);
 //
 // The caller must check the type of the parsed private key to ensure it is
 // suitable and validate other desired key properties such as RSA modulus size
-// or EC curve.
+// or EC curve. In particular, RSA private key operations scale cubicly, so
+// applications accepting RSA private keys from external sources may need to
+// bound key sizes (use |EVP_PKEY_bits| or |RSA_bits|) to avoid a DoS vector.
 //
 // A PrivateKeyInfo ends with an optional set of attributes. These are not
 // processed and so this function will silently ignore any trailing data in the
@@ -239,6 +399,48 @@ OPENSSL_EXPORT EVP_PKEY *EVP_parse_private_key(CBS *cbs);
 // structure (RFC 5208) and appends the result to |cbb|. It returns one on
 // success and zero on error.
 OPENSSL_EXPORT int EVP_marshal_private_key(CBB *cbb, const EVP_PKEY *key);
+
+
+// Raw keys
+//
+// Some keys types support a "raw" serialization. Currently the only supported
+// raw format is Ed25519, where the public key and private key formats are those
+// specified in RFC 8032. Note the RFC 8032 private key format is the 32-byte
+// prefix of |ED25519_sign|'s 64-byte private key.
+
+// EVP_PKEY_new_raw_private_key returns a newly allocated |EVP_PKEY| wrapping a
+// private key of the specified type. It returns one on success and zero on
+// error.
+OPENSSL_EXPORT EVP_PKEY *EVP_PKEY_new_raw_private_key(int type, ENGINE *unused,
+                                                      const uint8_t *in,
+                                                      size_t len);
+
+// EVP_PKEY_new_raw_public_key returns a newly allocated |EVP_PKEY| wrapping a
+// public key of the specified type. It returns one on success and zero on
+// error.
+OPENSSL_EXPORT EVP_PKEY *EVP_PKEY_new_raw_public_key(int type, ENGINE *unused,
+                                                     const uint8_t *in,
+                                                     size_t len);
+
+// EVP_PKEY_get_raw_private_key outputs the private key for |pkey| in raw form.
+// If |out| is NULL, it sets |*out_len| to the size of the raw private key.
+// Otherwise, it writes at most |*out_len| bytes to |out| and sets |*out_len| to
+// the number of bytes written.
+//
+// It returns one on success and zero if |pkey| has no private key, the key
+// type does not support a raw format, or the buffer is too small.
+OPENSSL_EXPORT int EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey,
+                                                uint8_t *out, size_t *out_len);
+
+// EVP_PKEY_get_raw_public_key outputs the public key for |pkey| in raw form.
+// If |out| is NULL, it sets |*out_len| to the size of the raw public key.
+// Otherwise, it writes at most |*out_len| bytes to |out| and sets |*out_len| to
+// the number of bytes written.
+//
+// It returns one on success and zero if |pkey| has no public key, the key
+// type does not support a raw format, or the buffer is too small.
+OPENSSL_EXPORT int EVP_PKEY_get_raw_public_key(const EVP_PKEY *pkey,
+                                               uint8_t *out, size_t *out_len);
 
 
 // Signing
@@ -509,14 +711,15 @@ OPENSSL_EXPORT EVP_PKEY *EVP_PKEY_CTX_get0_pkey(EVP_PKEY_CTX *ctx);
 OPENSSL_EXPORT int EVP_PKEY_sign_init(EVP_PKEY_CTX *ctx);
 
 // EVP_PKEY_sign signs |digest_len| bytes from |digest| using |ctx|. If |sig| is
-// NULL, the maximum size of the signature is written to
-// |out_sig_len|. Otherwise, |*sig_len| must contain the number of bytes of
-// space available at |sig|. If sufficient, the signature will be written to
-// |sig| and |*sig_len| updated with the true length.
+// NULL, the maximum size of the signature is written to |out_sig_len|.
+// Otherwise, |*sig_len| must contain the number of bytes of space available at
+// |sig|. If sufficient, the signature will be written to |sig| and |*sig_len|
+// updated with the true length. This function will fail for signature
+// algorithms like Ed25519 that do not support signing pre-hashed inputs.
 //
-// This function expects a pre-hashed input and will fail for signature
-// algorithms which do not support this. Use |EVP_DigestSignInit| to sign an
-// unhashed input.
+// WARNING: |digest| must be the output of some hash function on the data to be
+// signed. Passing unhashed inputs will not result in a secure signature scheme.
+// Use |EVP_DigestSignInit| to sign an unhashed input.
 //
 // WARNING: Setting |sig| to NULL only gives the maximum size of the
 // signature. The actual signature may be smaller.
@@ -534,11 +737,13 @@ OPENSSL_EXPORT int EVP_PKEY_sign(EVP_PKEY_CTX *ctx, uint8_t *sig,
 OPENSSL_EXPORT int EVP_PKEY_verify_init(EVP_PKEY_CTX *ctx);
 
 // EVP_PKEY_verify verifies that |sig_len| bytes from |sig| are a valid
-// signature for |digest|.
+// signature for |digest|. This function will fail for signature
+// algorithms like Ed25519 that do not support signing pre-hashed inputs.
 //
-// This function expects a pre-hashed input and will fail for signature
-// algorithms which do not support this. Use |EVP_DigestVerifyInit| to verify a
-// signature given the unhashed input.
+// WARNING: |digest| must be the output of some hash function on the data to be
+// verified. Passing unhashed inputs will not result in a secure signature
+// scheme. Use |EVP_DigestVerifyInit| to verify a signature given the unhashed
+// input.
 //
 // It returns one on success or zero on error.
 OPENSSL_EXPORT int EVP_PKEY_verify(EVP_PKEY_CTX *ctx, const uint8_t *sig,
@@ -681,7 +886,8 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_get_signature_md(EVP_PKEY_CTX *ctx,
 // RSA specific control functions.
 
 // EVP_PKEY_CTX_set_rsa_padding sets the padding type to use. It should be one
-// of the |RSA_*_PADDING| values. Returns one on success or zero on error.
+// of the |RSA_*_PADDING| values. Returns one on success or zero on error. By
+// default, the padding is |RSA_PKCS1_PADDING|.
 OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_padding(EVP_PKEY_CTX *ctx, int padding);
 
 // EVP_PKEY_CTX_get_rsa_padding sets |*out_padding| to the current padding
@@ -699,6 +905,8 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_get_rsa_padding(EVP_PKEY_CTX *ctx,
 // If unsure, use -1.
 //
 // Returns one on success or zero on error.
+//
+// TODO(davidben): The default is currently -2. Switch it to -1.
 OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_pss_saltlen(EVP_PKEY_CTX *ctx,
                                                     int salt_len);
 
@@ -723,7 +931,10 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_keygen_pubexp(EVP_PKEY_CTX *ctx,
                                                       BIGNUM *e);
 
 // EVP_PKEY_CTX_set_rsa_oaep_md sets |md| as the digest used in OAEP padding.
-// Returns one on success or zero on error.
+// Returns one on success or zero on error. If unset, the default is SHA-1.
+// Callers are recommended to overwrite this default.
+//
+// TODO(davidben): Remove the default and require callers specify this.
 OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_oaep_md(EVP_PKEY_CTX *ctx,
                                                 const EVP_MD *md);
 
@@ -734,6 +945,10 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_get_rsa_oaep_md(EVP_PKEY_CTX *ctx,
 
 // EVP_PKEY_CTX_set_rsa_mgf1_md sets |md| as the digest used in MGF1. Returns
 // one on success or zero on error.
+//
+// If unset, the default is the signing hash for |RSA_PKCS1_PSS_PADDING| and the
+// OAEP hash for |RSA_PKCS1_OAEP_PADDING|. Callers are recommended to use this
+// default and not call this function.
 OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_mgf1_md(EVP_PKEY_CTX *ctx,
                                                 const EVP_MD *md);
 
@@ -779,6 +994,19 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_set_ec_paramgen_curve_nid(EVP_PKEY_CTX *ctx,
 // 2.5.8.1.1), but is no longer accepted.
 #define EVP_PKEY_RSA2 NID_rsa
 
+// EVP_PKEY_X448 is defined for OpenSSL compatibility, but we do not support
+// X448 and attempts to create keys will fail.
+#define EVP_PKEY_X448 NID_X448
+
+// EVP_PKEY_ED448 is defined for OpenSSL compatibility, but we do not support
+// Ed448 and attempts to create keys will fail.
+#define EVP_PKEY_ED448 NID_ED448
+
+// EVP_PKEY_get0 returns NULL. This function is provided for compatibility with
+// OpenSSL but does not return anything. Use the typed |EVP_PKEY_get0_*|
+// functions instead.
+OPENSSL_EXPORT void *EVP_PKEY_get0(const EVP_PKEY *pkey);
+
 // OpenSSL_add_all_algorithms does nothing.
 OPENSSL_EXPORT void OpenSSL_add_all_algorithms(void);
 
@@ -805,34 +1033,33 @@ OPENSSL_EXPORT void EVP_MD_do_all_sorted(void (*callback)(const EVP_MD *cipher,
                                                           void *arg),
                                          void *arg);
 
-// i2d_PrivateKey marshals a private key from |key| to an ASN.1, DER
-// structure. If |outp| is not NULL then the result is written to |*outp| and
-// |*outp| is advanced just past the output. It returns the number of bytes in
-// the result, whether written or not, or a negative value on error.
+OPENSSL_EXPORT void EVP_MD_do_all(void (*callback)(const EVP_MD *cipher,
+                                                   const char *name,
+                                                   const char *unused,
+                                                   void *arg),
+                                  void *arg);
+
+// i2d_PrivateKey marshals a private key from |key| to type-specific format, as
+// described in |i2d_SAMPLE|.
 //
-// RSA keys are serialized as a DER-encoded RSAPublicKey (RFC 3447) structure.
+// RSA keys are serialized as a DER-encoded RSAPublicKey (RFC 8017) structure.
 // EC keys are serialized as a DER-encoded ECPrivateKey (RFC 5915) structure.
 //
 // Use |RSA_marshal_private_key| or |EC_KEY_marshal_private_key| instead.
 OPENSSL_EXPORT int i2d_PrivateKey(const EVP_PKEY *key, uint8_t **outp);
 
-// i2d_PublicKey marshals a public key from |key| to a type-specific format.
-// If |outp| is not NULL then the result is written to |*outp| and
-// |*outp| is advanced just past the output. It returns the number of bytes in
-// the result, whether written or not, or a negative value on error.
+// i2d_PublicKey marshals a public key from |key| to a type-specific format, as
+// described in |i2d_SAMPLE|.
 //
-// RSA keys are serialized as a DER-encoded RSAPublicKey (RFC 3447) structure.
+// RSA keys are serialized as a DER-encoded RSAPublicKey (RFC 8017) structure.
 // EC keys are serialized as an EC point per SEC 1.
 //
 // Use |RSA_marshal_public_key| or |EC_POINT_point2cbb| instead.
 OPENSSL_EXPORT int i2d_PublicKey(const EVP_PKEY *key, uint8_t **outp);
 
-// d2i_PrivateKey parses an ASN.1, DER-encoded, private key from |len| bytes at
-// |*inp|. If |out| is not NULL then, on exit, a pointer to the result is in
-// |*out|. Note that, even if |*out| is already non-NULL on entry, it will not
-// be written to. Rather, a fresh |EVP_PKEY| is allocated and the previous one
-// is freed. On successful exit, |*inp| is advanced past the DER structure. It
-// returns the result or NULL on error.
+// d2i_PrivateKey parses a DER-encoded private key from |len| bytes at |*inp|,
+// as described in |d2i_SAMPLE|. The private key must have type |type|,
+// otherwise it will be rejected.
 //
 // This function tries to detect one of several formats. Instead, use
 // |EVP_parse_private_key| for a PrivateKeyInfo, |RSA_parse_private_key| for an
@@ -849,15 +1076,12 @@ OPENSSL_EXPORT EVP_PKEY *d2i_PrivateKey(int type, EVP_PKEY **out,
 OPENSSL_EXPORT EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **out, const uint8_t **inp,
                                             long len);
 
-// d2i_PublicKey parse a public key from |len| bytes at |*inp| in a type-
-// specific format specified by |type|. If |out| is not NULL then, on exit, a
-// pointer to the result is in |*out|. Note that, even if |*out| is already non-
-// NULL on entry, it will not be written to. Rather, a fresh |EVP_PKEY| is
-// allocated and the previous one is freed. On successful exit, |*inp| is
-// advanced past the decoded key. It returns the result or NULL on error.
+// d2i_PublicKey parses a public key from |len| bytes at |*inp| in a type-
+// specific format specified by |type|, as described in |d2i_SAMPLE|.
 //
-// RSA keys are parsed as a DER-encoded RSAPublicKey (RFC 3447) structure.
-// Parsing EC keys is not supported by this function.
+// The only supported value for |type| is |EVP_PKEY_RSA|, which parses a
+// DER-encoded RSAPublicKey (RFC 8017) structure. Parsing EC keys is not
+// supported by this function.
 //
 // Use |RSA_parse_public_key| instead.
 OPENSSL_EXPORT EVP_PKEY *d2i_PublicKey(int type, EVP_PKEY **out,
@@ -874,6 +1098,91 @@ OPENSSL_EXPORT DH *EVP_PKEY_get1_DH(const EVP_PKEY *pkey);
 OPENSSL_EXPORT int EVP_PKEY_CTX_set_ec_param_enc(EVP_PKEY_CTX *ctx,
                                                  int encoding);
 
+// EVP_PKEY_set1_tls_encodedpoint replaces |pkey| with a public key encoded by
+// |in|. It returns one on success and zero on error.
+//
+// This function only works on X25519 keys.
+OPENSSL_EXPORT int EVP_PKEY_set1_tls_encodedpoint(EVP_PKEY *pkey,
+                                                  const uint8_t *in,
+                                                  size_t len);
+
+// EVP_PKEY_get1_tls_encodedpoint sets |*out_ptr| to a newly-allocated buffer
+// containing the raw encoded public key for |pkey|. The caller must call
+// |OPENSSL_free| to release this buffer. The function returns the length of the
+// buffer on success and zero on error.
+//
+// This function only works on X25519 keys.
+OPENSSL_EXPORT size_t EVP_PKEY_get1_tls_encodedpoint(const EVP_PKEY *pkey,
+                                                     uint8_t **out_ptr);
+
+// EVP_PKEY_base_id calls |EVP_PKEY_id|.
+OPENSSL_EXPORT int EVP_PKEY_base_id(const EVP_PKEY *pkey);
+
+// EVP_PKEY_CTX_set_rsa_pss_keygen_md returns 0.
+OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_pss_keygen_md(EVP_PKEY_CTX *ctx,
+                                                      const EVP_MD *md);
+
+// EVP_PKEY_CTX_set_rsa_pss_keygen_saltlen returns 0.
+OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_pss_keygen_saltlen(EVP_PKEY_CTX *ctx,
+                                                           int salt_len);
+
+// EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md returns 0.
+OPENSSL_EXPORT int EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md(EVP_PKEY_CTX *ctx,
+                                                           const EVP_MD *md);
+
+// i2d_PUBKEY marshals |pkey| as a DER-encoded SubjectPublicKeyInfo, as
+// described in |i2d_SAMPLE|.
+//
+// Use |EVP_marshal_public_key| instead.
+OPENSSL_EXPORT int i2d_PUBKEY(const EVP_PKEY *pkey, uint8_t **outp);
+
+// d2i_PUBKEY parses a DER-encoded SubjectPublicKeyInfo from |len| bytes at
+// |*inp|, as described in |d2i_SAMPLE|.
+//
+// Use |EVP_parse_public_key| instead.
+OPENSSL_EXPORT EVP_PKEY *d2i_PUBKEY(EVP_PKEY **out, const uint8_t **inp,
+                                    long len);
+
+// i2d_RSA_PUBKEY marshals |rsa| as a DER-encoded SubjectPublicKeyInfo
+// structure, as described in |i2d_SAMPLE|.
+//
+// Use |EVP_marshal_public_key| instead.
+OPENSSL_EXPORT int i2d_RSA_PUBKEY(const RSA *rsa, uint8_t **outp);
+
+// d2i_RSA_PUBKEY parses an RSA public key as a DER-encoded SubjectPublicKeyInfo
+// from |len| bytes at |*inp|, as described in |d2i_SAMPLE|.
+// SubjectPublicKeyInfo structures containing other key types are rejected.
+//
+// Use |EVP_parse_public_key| instead.
+OPENSSL_EXPORT RSA *d2i_RSA_PUBKEY(RSA **out, const uint8_t **inp, long len);
+
+// i2d_DSA_PUBKEY marshals |dsa| as a DER-encoded SubjectPublicKeyInfo, as
+// described in |i2d_SAMPLE|.
+//
+// Use |EVP_marshal_public_key| instead.
+OPENSSL_EXPORT int i2d_DSA_PUBKEY(const DSA *dsa, uint8_t **outp);
+
+// d2i_DSA_PUBKEY parses a DSA public key as a DER-encoded SubjectPublicKeyInfo
+// from |len| bytes at |*inp|, as described in |d2i_SAMPLE|.
+// SubjectPublicKeyInfo structures containing other key types are rejected.
+//
+// Use |EVP_parse_public_key| instead.
+OPENSSL_EXPORT DSA *d2i_DSA_PUBKEY(DSA **out, const uint8_t **inp, long len);
+
+// i2d_EC_PUBKEY marshals |ec_key| as a DER-encoded SubjectPublicKeyInfo, as
+// described in |i2d_SAMPLE|.
+//
+// Use |EVP_marshal_public_key| instead.
+OPENSSL_EXPORT int i2d_EC_PUBKEY(const EC_KEY *ec_key, uint8_t **outp);
+
+// d2i_EC_PUBKEY parses an EC public key as a DER-encoded SubjectPublicKeyInfo
+// from |len| bytes at |*inp|, as described in |d2i_SAMPLE|.
+// SubjectPublicKeyInfo structures containing other key types are rejected.
+//
+// Use |EVP_parse_public_key| instead.
+OPENSSL_EXPORT EC_KEY *d2i_EC_PUBKEY(EC_KEY **out, const uint8_t **inp,
+                                     long len);
+
 
 // Preprocessor compatibility section (hidden).
 //
@@ -887,6 +1196,15 @@ OPENSSL_EXPORT int EVP_PKEY_CTX_set_ec_param_enc(EVP_PKEY_CTX *ctx,
 #define EVP_PKEY_CTX_set_rsa_oaep_md EVP_PKEY_CTX_set_rsa_oaep_md
 #define EVP_PKEY_CTX_set0_rsa_oaep_label EVP_PKEY_CTX_set0_rsa_oaep_label
 #endif
+
+
+// Nodejs compatibility section (hidden).
+//
+// These defines exist for node.js, with the hope that we can eliminate the
+// need for them over time.
+
+#define EVPerr(function, reason) \
+  ERR_put_error(ERR_LIB_EVP, 0, reason, __FILE__, __LINE__)
 
 
 // Private structures.
@@ -927,40 +1245,5 @@ BSSL_NAMESPACE_END
 }  // extern C++
 
 #endif
-
-#define EVP_R_BUFFER_TOO_SMALL 100
-#define EVP_R_COMMAND_NOT_SUPPORTED 101
-#define EVP_R_DECODE_ERROR 102
-#define EVP_R_DIFFERENT_KEY_TYPES 103
-#define EVP_R_DIFFERENT_PARAMETERS 104
-#define EVP_R_ENCODE_ERROR 105
-#define EVP_R_EXPECTING_AN_EC_KEY_KEY 106
-#define EVP_R_EXPECTING_AN_RSA_KEY 107
-#define EVP_R_EXPECTING_A_DSA_KEY 108
-#define EVP_R_ILLEGAL_OR_UNSUPPORTED_PADDING_MODE 109
-#define EVP_R_INVALID_DIGEST_LENGTH 110
-#define EVP_R_INVALID_DIGEST_TYPE 111
-#define EVP_R_INVALID_KEYBITS 112
-#define EVP_R_INVALID_MGF1_MD 113
-#define EVP_R_INVALID_OPERATION 114
-#define EVP_R_INVALID_PADDING_MODE 115
-#define EVP_R_INVALID_PSS_SALTLEN 116
-#define EVP_R_KEYS_NOT_SET 117
-#define EVP_R_MISSING_PARAMETERS 118
-#define EVP_R_NO_DEFAULT_DIGEST 119
-#define EVP_R_NO_KEY_SET 120
-#define EVP_R_NO_MDC2_SUPPORT 121
-#define EVP_R_NO_NID_FOR_CURVE 122
-#define EVP_R_NO_OPERATION_SET 123
-#define EVP_R_NO_PARAMETERS_SET 124
-#define EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE 125
-#define EVP_R_OPERATON_NOT_INITIALIZED 126
-#define EVP_R_UNKNOWN_PUBLIC_KEY_TYPE 127
-#define EVP_R_UNSUPPORTED_ALGORITHM 128
-#define EVP_R_UNSUPPORTED_PUBLIC_KEY_TYPE 129
-#define EVP_R_NOT_A_PRIVATE_KEY 130
-#define EVP_R_INVALID_SIGNATURE 131
-#define EVP_R_MEMORY_LIMIT_EXCEEDED 132
-#define EVP_R_INVALID_PARAMETERS 133
 
 #endif  // OPENSSL_HEADER_EVP_H

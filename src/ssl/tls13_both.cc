@@ -133,9 +133,9 @@ bool tls13_process_certificate(SSL_HANDSHAKE *hs, const SSLMessage &msg,
     }
 
     ssl_cert_decompression_func_t decompress = nullptr;
-    for (const auto* alg : ssl->ctx->cert_compression_algs.get()) {
-      if (alg->alg_id == alg_id) {
-        decompress = alg->decompress;
+    for (const auto &alg : ssl->ctx->cert_compression_algs) {
+      if (alg.alg_id == alg_id) {
+        decompress = alg.decompress;
         break;
       }
     }
@@ -235,37 +235,29 @@ bool tls13_process_certificate(SSL_HANDSHAKE *hs, const SSLMessage &msg,
     }
 
     // Parse out the extensions.
-    bool have_status_request = false, have_sct = false;
-    CBS status_request, sct;
-    const SSL_EXTENSION_TYPE ext_types[] = {
-        {TLSEXT_TYPE_status_request, &have_status_request, &status_request},
-        {TLSEXT_TYPE_certificate_timestamp, &have_sct, &sct},
-    };
-
+    SSLExtension status_request(
+        TLSEXT_TYPE_status_request,
+        !ssl->server && hs->config->ocsp_stapling_enabled);
+    SSLExtension sct(
+        TLSEXT_TYPE_certificate_timestamp,
+        !ssl->server && hs->config->signed_cert_timestamps_enabled);
     uint8_t alert = SSL_AD_DECODE_ERROR;
-    if (!ssl_parse_extensions(&extensions, &alert, ext_types,
-                              OPENSSL_ARRAY_SIZE(ext_types),
-                              0 /* reject unknown */)) {
+    if (!ssl_parse_extensions(&extensions, &alert, {&status_request, &sct},
+                              /*ignore_unknown=*/false)) {
       ssl_send_alert(ssl, SSL3_AL_FATAL, alert);
       return false;
     }
 
     // All Certificate extensions are parsed, but only the leaf extensions are
     // stored.
-    if (have_status_request) {
-      if (ssl->server || !hs->config->ocsp_stapling_enabled) {
-        OPENSSL_PUT_ERROR(SSL, SSL_R_UNEXPECTED_EXTENSION);
-        ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_UNSUPPORTED_EXTENSION);
-        return false;
-      }
-
+    if (status_request.present) {
       uint8_t status_type;
       CBS ocsp_response;
-      if (!CBS_get_u8(&status_request, &status_type) ||
+      if (!CBS_get_u8(&status_request.data, &status_type) ||
           status_type != TLSEXT_STATUSTYPE_ocsp ||
-          !CBS_get_u24_length_prefixed(&status_request, &ocsp_response) ||
+          !CBS_get_u24_length_prefixed(&status_request.data, &ocsp_response) ||
           CBS_len(&ocsp_response) == 0 ||
-          CBS_len(&status_request) != 0) {
+          CBS_len(&status_request.data) != 0) {
         ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECODE_ERROR);
         return false;
       }
@@ -280,14 +272,8 @@ bool tls13_process_certificate(SSL_HANDSHAKE *hs, const SSLMessage &msg,
       }
     }
 
-    if (have_sct) {
-      if (ssl->server || !hs->config->signed_cert_timestamps_enabled) {
-        OPENSSL_PUT_ERROR(SSL, SSL_R_UNEXPECTED_EXTENSION);
-        ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_UNSUPPORTED_EXTENSION);
-        return false;
-      }
-
-      if (!ssl_is_sct_list_valid(&sct)) {
+    if (sct.present) {
+      if (!ssl_is_sct_list_valid(&sct.data)) {
         OPENSSL_PUT_ERROR(SSL, SSL_R_ERROR_PARSING_EXTENSION);
         ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECODE_ERROR);
         return false;
@@ -295,7 +281,7 @@ bool tls13_process_certificate(SSL_HANDSHAKE *hs, const SSLMessage &msg,
 
       if (sk_CRYPTO_BUFFER_num(certs.get()) == 1) {
         hs->new_session->signed_cert_timestamp_list.reset(
-            CRYPTO_BUFFER_new_from_CBS(&sct, ssl->ctx->pool));
+            CRYPTO_BUFFER_new_from_CBS(&sct.data, ssl->ctx->pool));
         if (hs->new_session->signed_cert_timestamp_list == nullptr) {
           ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_INTERNAL_ERROR);
           return false;
@@ -356,7 +342,7 @@ bool tls13_process_certificate_verify(SSL_HANDSHAKE *hs, const SSLMessage &msg) 
   }
 
   uint8_t alert = SSL_AD_DECODE_ERROR;
-  if (!tls12_check_peer_sigalg(ssl, &alert, signature_algorithm)) {
+  if (!tls12_check_peer_sigalg(hs, &alert, signature_algorithm)) {
     ssl_send_alert(ssl, SSL3_AL_FATAL, alert);
     return false;
   }
@@ -370,13 +356,8 @@ bool tls13_process_certificate_verify(SSL_HANDSHAKE *hs, const SSLMessage &msg) 
     return false;
   }
 
-  bool sig_ok = ssl_public_key_verify(ssl, signature, signature_algorithm,
-                                      hs->peer_pubkey.get(), input);
-#if defined(BORINGSSL_UNSAFE_FUZZER_MODE)
-  sig_ok = true;
-  ERR_clear_error();
-#endif
-  if (!sig_ok) {
+  if (!ssl_public_key_verify(ssl, signature, signature_algorithm,
+                             hs->peer_pubkey.get(), input)) {
     OPENSSL_PUT_ERROR(SSL, SSL_R_BAD_SIGNATURE);
     ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECRYPT_ERROR);
     return false;
@@ -389,21 +370,20 @@ bool tls13_process_finished(SSL_HANDSHAKE *hs, const SSLMessage &msg,
                             bool use_saved_value) {
   SSL *const ssl = hs->ssl;
   uint8_t verify_data_buf[EVP_MAX_MD_SIZE];
-  const uint8_t *verify_data;
-  size_t verify_data_len;
+  Span<const uint8_t> verify_data;
   if (use_saved_value) {
     assert(ssl->server);
-    verify_data = hs->expected_client_finished;
-    verify_data_len = hs->hash_len;
+    verify_data = hs->expected_client_finished();
   } else {
-    if (!tls13_finished_mac(hs, verify_data_buf, &verify_data_len,
-                            !ssl->server)) {
+    size_t len;
+    if (!tls13_finished_mac(hs, verify_data_buf, &len, !ssl->server)) {
       return false;
     }
-    verify_data = verify_data_buf;
+    verify_data = MakeConstSpan(verify_data_buf, len);
   }
 
-  bool finished_ok = CBS_mem_equal(&msg.body, verify_data, verify_data_len);
+  bool finished_ok =
+      CBS_mem_equal(&msg.body, verify_data.data(), verify_data.size());
 #if defined(BORINGSSL_UNSAFE_FUZZER_MODE)
   finished_ok = true;
 #endif
@@ -488,15 +468,16 @@ bool tls13_add_certificate(SSL_HANDSHAKE *hs) {
 
   if (ssl_signing_with_dc(hs)) {
     const CRYPTO_BUFFER *raw = dc->raw.get();
+    CBB child;
     if (!CBB_add_u16(&extensions, TLSEXT_TYPE_delegated_credential) ||
-        !CBB_add_u16(&extensions, CRYPTO_BUFFER_len(raw)) ||
-        !CBB_add_bytes(&extensions,
-                       CRYPTO_BUFFER_data(raw),
+        !CBB_add_u16_length_prefixed(&extensions, &child) ||
+        !CBB_add_bytes(&child, CRYPTO_BUFFER_data(raw),
                        CRYPTO_BUFFER_len(raw)) ||
         !CBB_flush(&extensions)) {
       OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
-      return 0;
+      return false;
     }
+    ssl->s3->delegated_credential_used = true;
   }
 
   for (size_t i = 1; i < sk_CRYPTO_BUFFER_num(cert->chain.get()); i++) {
@@ -522,9 +503,9 @@ bool tls13_add_certificate(SSL_HANDSHAKE *hs) {
   }
 
   const CertCompressionAlg *alg = nullptr;
-  for (const auto *candidate : ssl->ctx->cert_compression_algs.get()) {
-    if (candidate->alg_id == hs->cert_compression_alg_id) {
-      alg = candidate;
+  for (const auto &candidate : ssl->ctx->cert_compression_algs) {
+    if (candidate.alg_id == hs->cert_compression_alg_id) {
+      alg = &candidate;
       break;
     }
   }
@@ -540,9 +521,37 @@ bool tls13_add_certificate(SSL_HANDSHAKE *hs) {
                                  SSL3_MT_COMPRESSED_CERTIFICATE) ||
       !CBB_add_u16(body, hs->cert_compression_alg_id) ||
       !CBB_add_u24(body, msg.size()) ||
-      !CBB_add_u24_length_prefixed(body, &compressed) ||
-      !alg->compress(ssl, &compressed, msg.data(), msg.size()) ||
-      !ssl_add_message_cbb(ssl, cbb.get())) {
+      !CBB_add_u24_length_prefixed(body, &compressed)) {
+    OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
+    return false;
+  }
+
+  SSL_HANDSHAKE_HINTS *const hints = hs->hints.get();
+  if (hints && !hs->hints_requested &&
+      hints->cert_compression_alg_id == hs->cert_compression_alg_id &&
+      hints->cert_compression_input == MakeConstSpan(msg) &&
+      !hints->cert_compression_output.empty()) {
+    if (!CBB_add_bytes(&compressed, hints->cert_compression_output.data(),
+                       hints->cert_compression_output.size())) {
+      OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
+      return false;
+    }
+  } else {
+    if (!alg->compress(ssl, &compressed, msg.data(), msg.size())) {
+      OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
+      return false;
+    }
+    if (hints && hs->hints_requested) {
+      hints->cert_compression_alg_id = hs->cert_compression_alg_id;
+      if (!hints->cert_compression_input.CopyFrom(msg) ||
+          !hints->cert_compression_output.CopyFrom(
+              MakeConstSpan(CBB_data(&compressed), CBB_len(&compressed)))) {
+        return false;
+      }
+    }
+  }
+
+  if (!ssl_add_message_cbb(ssl, cbb.get())) {
     OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
     return false;
   }
@@ -586,10 +595,40 @@ enum ssl_private_key_result_t tls13_add_certificate_verify(SSL_HANDSHAKE *hs) {
     return ssl_private_key_failure;
   }
 
-  enum ssl_private_key_result_t sign_result = ssl_private_key_sign(
-      hs, sig, &sig_len, max_sig_len, signature_algorithm, msg);
-  if (sign_result != ssl_private_key_success) {
-    return sign_result;
+  SSL_HANDSHAKE_HINTS *const hints = hs->hints.get();
+  Array<uint8_t> spki;
+  if (hints) {
+    ScopedCBB spki_cbb;
+    if (!CBB_init(spki_cbb.get(), 64) ||
+        !EVP_marshal_public_key(spki_cbb.get(), hs->local_pubkey.get()) ||
+        !CBBFinishArray(spki_cbb.get(), &spki)) {
+      ssl_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_INTERNAL_ERROR);
+      return ssl_private_key_failure;
+    }
+  }
+
+  if (hints && !hs->hints_requested &&
+      signature_algorithm == hints->signature_algorithm &&
+      MakeConstSpan(msg) == hints->signature_input &&
+      MakeConstSpan(spki) == hints->signature_spki &&
+      !hints->signature.empty() && hints->signature.size() <= max_sig_len) {
+    // Signature algorithm and input both match. Reuse the signature from hints.
+    sig_len = hints->signature.size();
+    OPENSSL_memcpy(sig, hints->signature.data(), sig_len);
+  } else {
+    enum ssl_private_key_result_t sign_result = ssl_private_key_sign(
+        hs, sig, &sig_len, max_sig_len, signature_algorithm, msg);
+    if (sign_result != ssl_private_key_success) {
+      return sign_result;
+    }
+    if (hints && hs->hints_requested) {
+      hints->signature_algorithm = signature_algorithm;
+      hints->signature_input = std::move(msg);
+      hints->signature_spki = std::move(spki);
+      if (!hints->signature.CopyFrom(MakeSpan(sig, sig_len))) {
+        return ssl_private_key_failure;
+      }
+    }
   }
 
   if (!CBB_did_write(&child, sig_len) ||

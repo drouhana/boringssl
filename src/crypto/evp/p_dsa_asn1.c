@@ -141,9 +141,13 @@ static int dsa_priv_decode(EVP_PKEY *out, CBS *params, CBS *key) {
     goto err;
   }
 
-  // Decode the key.
+  // Decode the key. To avoid DoS attacks when importing private keys, we bound
+  // |dsa->priv_key| against |dsa->q|, which itself bound by
+  // |DSA_parse_parameters|. (We cannot call |BN_num_bits| on |dsa->priv_key|.
+  // That would leak a secret bit width.)
   if (!BN_parse_asn1_unsigned(key, dsa->priv_key) ||
-      CBS_len(key) != 0) {
+      CBS_len(key) != 0 ||
+      BN_cmp(dsa->priv_key, dsa->q) >= 0) {
     OPENSSL_PUT_ERROR(EVP, EVP_R_DECODE_ERROR);
     goto err;
   }
@@ -191,7 +195,9 @@ static int dsa_priv_encode(CBB *out, const EVP_PKEY *key) {
   return 1;
 }
 
-static int int_dsa_size(const EVP_PKEY *pkey) {
+// OQS note: We have renamed this from "int_dsa_size"
+// to "size_t_dsa_size"
+static size_t size_t_dsa_size(const EVP_PKEY *pkey) {
   return DSA_size(pkey->pkey.dsa);
 }
 
@@ -255,9 +261,14 @@ const EVP_PKEY_ASN1_METHOD dsa_asn1_meth = {
   dsa_priv_decode,
   dsa_priv_encode,
 
+  NULL /* set_priv_raw */,
+  NULL /* set_pub_raw */,
+  NULL /* get_priv_raw */,
+  NULL /* get_pub_raw */,
+
   NULL /* pkey_opaque */,
 
-  int_dsa_size,
+  size_t_dsa_size,
   dsa_bits,
 
   dsa_missing_parameters,

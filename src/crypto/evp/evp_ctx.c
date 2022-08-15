@@ -65,17 +65,76 @@
 #include "../internal.h"
 #include "internal.h"
 
-
 static const EVP_PKEY_METHOD *const evp_methods[] = {
-  &rsa_pkey_meth,
-  &ec_pkey_meth,
-  &ed25519_pkey_meth,
+    &rsa_pkey_meth,
+    &ec_pkey_meth,
+    &ed25519_pkey_meth,
+    &x25519_pkey_meth,
+///// OQS_TEMPLATE_FRAGMENT_LIST_PKEY_METHS_START
+    &dilithium2_pkey_meth,
+    &dilithium3_pkey_meth,
+    &dilithium5_pkey_meth,
+    &dilithium2_aes_pkey_meth,
+    &dilithium3_aes_pkey_meth,
+    &dilithium5_aes_pkey_meth,
+    &falcon512_pkey_meth,
+    &falcon1024_pkey_meth,
+    &picnicl1fs_pkey_meth,
+    &picnicl1ur_pkey_meth,
+    &picnicl1full_pkey_meth,
+    &picnic3l1_pkey_meth,
+    &picnic3l3_pkey_meth,
+    &picnic3l5_pkey_meth,
+    &rainbowIclassic_pkey_meth,
+    &rainbowIcircumzenithal_pkey_meth,
+    &rainbowIcompressed_pkey_meth,
+    &rainbowIIIclassic_pkey_meth,
+    &rainbowIIIcircumzenithal_pkey_meth,
+    &rainbowIIIcompressed_pkey_meth,
+    &rainbowVclassic_pkey_meth,
+    &rainbowVcircumzenithal_pkey_meth,
+    &rainbowVcompressed_pkey_meth,
+    &sphincsharaka128frobust_pkey_meth,
+    &sphincsharaka128fsimple_pkey_meth,
+    &sphincsharaka128srobust_pkey_meth,
+    &sphincsharaka128ssimple_pkey_meth,
+    &sphincsharaka192frobust_pkey_meth,
+    &sphincsharaka192fsimple_pkey_meth,
+    &sphincsharaka192srobust_pkey_meth,
+    &sphincsharaka192ssimple_pkey_meth,
+    &sphincsharaka256frobust_pkey_meth,
+    &sphincsharaka256fsimple_pkey_meth,
+    &sphincsharaka256srobust_pkey_meth,
+    &sphincsharaka256ssimple_pkey_meth,
+    &sphincssha256128frobust_pkey_meth,
+    &sphincssha256128fsimple_pkey_meth,
+    &sphincssha256128srobust_pkey_meth,
+    &sphincssha256128ssimple_pkey_meth,
+    &sphincssha256192frobust_pkey_meth,
+    &sphincssha256192fsimple_pkey_meth,
+    &sphincssha256192srobust_pkey_meth,
+    &sphincssha256192ssimple_pkey_meth,
+    &sphincssha256256frobust_pkey_meth,
+    &sphincssha256256fsimple_pkey_meth,
+    &sphincssha256256srobust_pkey_meth,
+    &sphincssha256256ssimple_pkey_meth,
+    &sphincsshake256128frobust_pkey_meth,
+    &sphincsshake256128fsimple_pkey_meth,
+    &sphincsshake256128srobust_pkey_meth,
+    &sphincsshake256128ssimple_pkey_meth,
+    &sphincsshake256192frobust_pkey_meth,
+    &sphincsshake256192fsimple_pkey_meth,
+    &sphincsshake256192srobust_pkey_meth,
+    &sphincsshake256192ssimple_pkey_meth,
+    &sphincsshake256256frobust_pkey_meth,
+    &sphincsshake256256fsimple_pkey_meth,
+    &sphincsshake256256srobust_pkey_meth,
+    &sphincsshake256256ssimple_pkey_meth,
+///// OQS_TEMPLATE_FRAGMENT_LIST_PKEY_METHS_END
 };
 
 static const EVP_PKEY_METHOD *evp_pkey_meth_find(int type) {
-  unsigned i;
-
-  for (i = 0; i < sizeof(evp_methods)/sizeof(EVP_PKEY_METHOD*); i++) {
+  for (size_t i = 0; i < sizeof(evp_methods)/sizeof(EVP_PKEY_METHOD*); i++) {
     if (evp_methods[i]->pkey_id == type) {
       return evp_methods[i];
     }

@@ -83,8 +83,72 @@ int x509_digest_sign_algorithm(EVP_MD_CTX *ctx, X509_ALGOR *algor) {
     }
   }
 
-  if (EVP_PKEY_id(pkey) == EVP_PKEY_ED25519) {
-    return X509_ALGOR_set0(algor, OBJ_nid2obj(NID_ED25519), V_ASN1_UNDEF, NULL);
+  int pkey_id = EVP_PKEY_id(pkey);
+  if (pkey_id == EVP_PKEY_ED25519 ||
+///// OQS_TEMPLATE_FRAGMENT_CHECK_PKEY_ID_START
+      pkey_id == EVP_PKEY_DILITHIUM2 ||
+      pkey_id == EVP_PKEY_DILITHIUM3 ||
+      pkey_id == EVP_PKEY_DILITHIUM5 ||
+      pkey_id == EVP_PKEY_DILITHIUM2_AES ||
+      pkey_id == EVP_PKEY_DILITHIUM3_AES ||
+      pkey_id == EVP_PKEY_DILITHIUM5_AES ||
+      pkey_id == EVP_PKEY_FALCON512 ||
+      pkey_id == EVP_PKEY_FALCON1024 ||
+      pkey_id == EVP_PKEY_PICNICL1FS ||
+      pkey_id == EVP_PKEY_PICNICL1UR ||
+      pkey_id == EVP_PKEY_PICNICL1FULL ||
+      pkey_id == EVP_PKEY_PICNIC3L1 ||
+      pkey_id == EVP_PKEY_PICNIC3L3 ||
+      pkey_id == EVP_PKEY_PICNIC3L5 ||
+      pkey_id == EVP_PKEY_RAINBOWICLASSIC ||
+      pkey_id == EVP_PKEY_RAINBOWICIRCUMZENITHAL ||
+      pkey_id == EVP_PKEY_RAINBOWICOMPRESSED ||
+      pkey_id == EVP_PKEY_RAINBOWIIICLASSIC ||
+      pkey_id == EVP_PKEY_RAINBOWIIICIRCUMZENITHAL ||
+      pkey_id == EVP_PKEY_RAINBOWIIICOMPRESSED ||
+      pkey_id == EVP_PKEY_RAINBOWVCLASSIC ||
+      pkey_id == EVP_PKEY_RAINBOWVCIRCUMZENITHAL ||
+      pkey_id == EVP_PKEY_RAINBOWVCOMPRESSED ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA128FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA128FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA128SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA128SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA192FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA192FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA192SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA192SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA256FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA256FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA256SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSHARAKA256SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256128FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256128FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256128SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256128SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256192FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256192FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256192SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256192SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256256FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256256FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256256SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHA256256SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256128FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256128FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256128SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256128SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256192FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256192FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256192SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256192SSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256256FROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256256FSIMPLE ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256256SROBUST ||
+      pkey_id == EVP_PKEY_SPHINCSSHAKE256256SSIMPLE
+///// OQS_TEMPLATE_FRAGMENT_CHECK_PKEY_ID_END
+      ) {
+    // The NID == EVP_PKEY_id for ED25519 and the OQS schemes
+    return X509_ALGOR_set0(algor, OBJ_nid2obj(pkey_id), V_ASN1_UNDEF, NULL);
   }
 
   /* Default behavior: look up the OID for the algorithm/hash pair and encode
@@ -110,7 +174,7 @@ int x509_digest_sign_algorithm(EVP_MD_CTX *ctx, X509_ALGOR *algor) {
   return 1;
 }
 
-int x509_digest_verify_init(EVP_MD_CTX *ctx, X509_ALGOR *sigalg,
+int x509_digest_verify_init(EVP_MD_CTX *ctx, const X509_ALGOR *sigalg,
                             EVP_PKEY *pkey) {
   /* Convert the signature OID into digest and public key OIDs. */
   int sigalg_nid = OBJ_obj2nid(sigalg->algorithm);
@@ -139,6 +203,16 @@ int x509_digest_verify_init(EVP_MD_CTX *ctx, X509_ALGOR *sigalg,
       return EVP_DigestVerifyInit(ctx, NULL, NULL, NULL, pkey);
     }
     OPENSSL_PUT_ERROR(ASN1, ASN1_R_UNKNOWN_SIGNATURE_ALGORITHM);
+    return 0;
+  }
+
+  /* The parameter should be an explicit NULL for RSA and omitted for ECDSA. For
+   * compatibility, we allow either for both algorithms. See b/167375496.
+   *
+   * TODO(davidben): Chromium's verifier allows both forms for RSA, but enforces
+   * ECDSA more strictly. Align with Chromium and add a flag for b/167375496. */
+  if (sigalg->parameter != NULL && sigalg->parameter->type != V_ASN1_NULL) {
+    OPENSSL_PUT_ERROR(X509, X509_R_INVALID_PARAMETER);
     return 0;
   }
 

@@ -364,7 +364,7 @@ rsadsi 2 5		: MD5			: md5
 rsadsi 2 6		:			: hmacWithMD5
 rsadsi 2 7		:			: hmacWithSHA1
 
-# From RFC4231
+# From RFC 4231
 rsadsi 2 8		:			: hmacWithSHA224
 rsadsi 2 9		:			: hmacWithSHA256
 rsadsi 2 10		:			: hmacWithSHA384
@@ -492,7 +492,7 @@ id-kp 6			: ipsecTunnel		: IPSec Tunnel
 id-kp 7			: ipsecUser		: IPSec User
 !Cname time-stamp
 id-kp 8			: timeStamping		: Time Stamping
-# From OCSP spec RFC2560
+# From OCSP spec RFC 2560
 !Cname OCSP-sign
 id-kp 9			: OCSPSigning		: OCSP Signing
 id-kp 10		: DVCS			: dvcs
@@ -776,7 +776,7 @@ id-ce 55		: targetInformation	: X509v3 AC Targeting
 !Cname no-rev-avail
 id-ce 56		: noRevAvail		: X509v3 No Revocation Available
 
-# From RFC5280
+# From RFC 5280
 ext-key-usage 0		: anyExtendedKeyUsage	: Any Extended Key Usage
 
 
@@ -820,7 +820,7 @@ internet 4		: private		: Private
 internet 5		: security		: Security
 internet 6		: snmpv2		: SNMPv2
 # Documents refer to "internet 7" as "mail". This however leads to ambiguities
-# with RFC2798, Section 9.1.3, where "mail" is defined as the short name for
+# with RFC 2798, Section 9.1.3, where "mail" is defined as the short name for
 # rfc822Mailbox. The short name is therefore here left out for a reason.
 # Subclasses of "mail", e.g. "MIME MHS" don't consitute a problem, as
 # references are realized via long name "Mail" (with capital M).
@@ -905,6 +905,7 @@ nist_hashalgs 1		: SHA256		: sha256
 nist_hashalgs 2		: SHA384		: sha384
 nist_hashalgs 3		: SHA512		: sha512
 nist_hashalgs 4		: SHA224		: sha224
+nist_hashalgs 6		: SHA512-256		: sha512-256
 
 # OIDs for dsa-with-sha224 and dsa-with-sha256
 !Alias dsa_with_sha2 nistAlgorithms 3
@@ -1312,7 +1313,7 @@ ISO-US 10046 2 1	: dhpublicnumber		: X9.42 DH
 1 3 36 3 3 2 8 1 1 13 : brainpoolP512r1
 1 3 36 3 3 2 8 1 1 14 : brainpoolP512t1
 
-# ECDH schemes from RFC5753
+# ECDH schemes from RFC 5753
 !Alias x9-63-scheme 1 3 133 16 840 63 0
 !Alias secg-scheme certicom-arc 1
 
@@ -1331,14 +1332,14 @@ secg-scheme 14 3 : dhSinglePass-cofactorDH-sha512kdf-scheme
                  : dh-std-kdf
                  : dh-cofactor-kdf
 
-# NID for X25519 (no corresponding OID).
- : X25519
-
 # NID for CECPQ2 (no corresponding OID).
  : CECPQ2
 
 # See RFC 8410.
+1 3 101 110 : X25519
+1 3 101 111 : X448
 1 3 101 112 : ED25519
+1 3 101 113 : ED448
 
  : ChaCha20-Poly1305 : chacha20-poly1305
 
@@ -1355,3 +1356,152 @@ secg-scheme 14 3 : dhSinglePass-cofactorDH-sha512kdf-scheme
 # TLS 1.3 cipher suites do not specify key exchange or authentication.
  : KxANY : kx-any
  : AuthANY : auth-any
+
+###### OQS_TEMPLATE_FRAGMENT_DEF_NIDS_START
+ : frodo640aes
+ : p256_frodo640aes
+ : frodo640shake
+ : p256_frodo640shake
+ : frodo976aes
+ : p384_frodo976aes
+ : frodo976shake
+ : p384_frodo976shake
+ : frodo1344aes
+ : p521_frodo1344aes
+ : frodo1344shake
+ : p521_frodo1344shake
+ : bikel1
+ : p256_bikel1
+ : bikel3
+ : p384_bikel3
+ : kyber512
+ : p256_kyber512
+ : kyber768
+ : p384_kyber768
+ : kyber1024
+ : p521_kyber1024
+ : ntru_hps2048509
+ : p256_ntru_hps2048509
+ : ntru_hps2048677
+ : p384_ntru_hps2048677
+ : ntru_hps4096821
+ : p521_ntru_hps4096821
+ : ntru_hps40961229
+ : p521_ntru_hps40961229
+ : ntru_hrss701
+ : p384_ntru_hrss701
+ : ntru_hrss1373
+ : p521_ntru_hrss1373
+ : lightsaber
+ : p256_lightsaber
+ : saber
+ : p384_saber
+ : firesaber
+ : p521_firesaber
+ : sidhp434
+ : p256_sidhp434
+ : sidhp503
+ : p256_sidhp503
+ : sidhp610
+ : p384_sidhp610
+ : sidhp751
+ : p521_sidhp751
+ : sikep434
+ : p256_sikep434
+ : sikep503
+ : p256_sikep503
+ : sikep610
+ : p384_sikep610
+ : sikep751
+ : p521_sikep751
+ : kyber90s512
+ : p256_kyber90s512
+ : kyber90s768
+ : p384_kyber90s768
+ : kyber90s1024
+ : p521_kyber90s1024
+ : hqc128
+ : p256_hqc128
+ : hqc192
+ : p384_hqc192
+ : hqc256
+ : p521_hqc256
+ : ntrulpr653
+ : p256_ntrulpr653
+ : ntrulpr761
+ : p256_ntrulpr761
+ : ntrulpr857
+ : p384_ntrulpr857
+ : ntrulpr1277
+ : p521_ntrulpr1277
+ : sntrup653
+ : p256_sntrup653
+ : sntrup761
+ : p256_sntrup761
+ : sntrup857
+ : p384_sntrup857
+ : sntrup1277
+ : p521_sntrup1277
+##### OQS_TEMPLATE_FRAGMENT_DEF_NIDS_END
+
+##### OQS_TEMPLATE_FRAGMENT_ASSIGN_OIDS_START
+1 3 6 1 4 1 2 267 7 4 4 : dilithium2 : dilithium2
+1 3 6 1 4 1 2 267 7 6 5 : dilithium3 : dilithium3
+1 3 6 1 4 1 2 267 7 8 7 : dilithium5 : dilithium5
+1 3 6 1 4 1 2 267 11 4 4 : dilithium2_aes : dilithium2_aes
+1 3 6 1 4 1 2 267 11 6 5 : dilithium3_aes : dilithium3_aes
+1 3 6 1 4 1 2 267 11 8 7 : dilithium5_aes : dilithium5_aes
+1 3 9999 3 1 : falcon512 : falcon512
+1 3 9999 3 4 : falcon1024 : falcon1024
+1 3 6 1 4 1 311 89 2 1 1 : picnicl1fs : picnicl1fs
+1 3 6 1 4 1 311 89 2 1 4 : picnicl1ur : picnicl1ur
+1 3 6 1 4 1 311 89 2 1 7 : picnicl1full : picnicl1full
+1 3 6 1 4 1 311 89 2 1 21 : picnic3l1 : picnic3l1
+1 3 6 1 4 1 311 89 2 1 24 : picnic3l3 : picnic3l3
+1 3 6 1 4 1 311 89 2 1 26 : picnic3l5 : picnic3l5
+1 3 9999 5 1 1 1 : rainbowIclassic : rainbowIclassic
+1 3 9999 5 1 4 1 : rainbowIcircumzenithal : rainbowIcircumzenithal
+1 3 9999 5 1 7 1 : rainbowIcompressed : rainbowIcompressed
+1 3 9999 5 2 1 1 : rainbowIIIclassic : rainbowIIIclassic
+1 3 9999 5 2 3 1 : rainbowIIIcircumzenithal : rainbowIIIcircumzenithal
+1 3 9999 5 2 5 1 : rainbowIIIcompressed : rainbowIIIcompressed
+1 3 9999 5 3 1 1 : rainbowVclassic : rainbowVclassic
+1 3 9999 5 3 3 1 : rainbowVcircumzenithal : rainbowVcircumzenithal
+1 3 9999 5 3 5 1 : rainbowVcompressed : rainbowVcompressed
+1 3 9999 6 1 1 : sphincsharaka128frobust : sphincsharaka128frobust
+1 3 9999 6 1 4 : sphincsharaka128fsimple : sphincsharaka128fsimple
+1 3 9999 6 1 7 : sphincsharaka128srobust : sphincsharaka128srobust
+1 3 9999 6 1 10 : sphincsharaka128ssimple : sphincsharaka128ssimple
+1 3 9999 6 2 1 : sphincsharaka192frobust : sphincsharaka192frobust
+1 3 9999 6 2 3 : sphincsharaka192fsimple : sphincsharaka192fsimple
+1 3 9999 6 2 5 : sphincsharaka192srobust : sphincsharaka192srobust
+1 3 9999 6 2 7 : sphincsharaka192ssimple : sphincsharaka192ssimple
+1 3 9999 6 3 1 : sphincsharaka256frobust : sphincsharaka256frobust
+1 3 9999 6 3 3 : sphincsharaka256fsimple : sphincsharaka256fsimple
+1 3 9999 6 3 5 : sphincsharaka256srobust : sphincsharaka256srobust
+1 3 9999 6 3 7 : sphincsharaka256ssimple : sphincsharaka256ssimple
+1 3 9999 6 4 1 : sphincssha256128frobust : sphincssha256128frobust
+1 3 9999 6 4 4 : sphincssha256128fsimple : sphincssha256128fsimple
+1 3 9999 6 4 7 : sphincssha256128srobust : sphincssha256128srobust
+1 3 9999 6 4 10 : sphincssha256128ssimple : sphincssha256128ssimple
+1 3 9999 6 5 1 : sphincssha256192frobust : sphincssha256192frobust
+1 3 9999 6 5 3 : sphincssha256192fsimple : sphincssha256192fsimple
+1 3 9999 6 5 5 : sphincssha256192srobust : sphincssha256192srobust
+1 3 9999 6 5 7 : sphincssha256192ssimple : sphincssha256192ssimple
+1 3 9999 6 6 1 : sphincssha256256frobust : sphincssha256256frobust
+1 3 9999 6 6 3 : sphincssha256256fsimple : sphincssha256256fsimple
+1 3 9999 6 6 5 : sphincssha256256srobust : sphincssha256256srobust
+1 3 9999 6 6 7 : sphincssha256256ssimple : sphincssha256256ssimple
+1 3 9999 6 7 1 : sphincsshake256128frobust : sphincsshake256128frobust
+1 3 9999 6 7 4 : sphincsshake256128fsimple : sphincsshake256128fsimple
+1 3 9999 6 7 7 : sphincsshake256128srobust : sphincsshake256128srobust
+1 3 9999 6 7 10 : sphincsshake256128ssimple : sphincsshake256128ssimple
+1 3 9999 6 8 1 : sphincsshake256192frobust : sphincsshake256192frobust
+1 3 9999 6 8 3 : sphincsshake256192fsimple : sphincsshake256192fsimple
+1 3 9999 6 8 5 : sphincsshake256192srobust : sphincsshake256192srobust
+1 3 9999 6 8 7 : sphincsshake256192ssimple : sphincsshake256192ssimple
+1 3 9999 6 9 1 : sphincsshake256256frobust : sphincsshake256256frobust
+1 3 9999 6 9 3 : sphincsshake256256fsimple : sphincsshake256256fsimple
+1 3 9999 6 9 5 : sphincsshake256256srobust : sphincsshake256256srobust
+1 3 9999 6 9 7 : sphincsshake256256ssimple : sphincsshake256256ssimple
+##### OQS_TEMPLATE_FRAGMENT_ASSIGN_OIDS_END
