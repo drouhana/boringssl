@@ -163,7 +163,7 @@ cc_library(
     copts = boringssl_copts_c11,
     includes = [
         "src/include",
-        "src/oqs/include/oqs",
+        "src/oqs/include",
         ],
     linkopts = select({
         # Android supports pthreads, but does not provide a libpthread
@@ -184,7 +184,7 @@ cc_library(
     copts = boringssl_copts_cxx,
     includes = [
         "src/include",
-        "src/oqs/include/oqs",
+        "src/oqs/include",
         ],
     visibility = ["//visibility:public"],
     linkstatic = True,
