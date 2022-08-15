@@ -26,15 +26,15 @@ import json
 # OS_ARCH_COMBOS maps from OS and platform to the OpenSSL assembly "style" for
 # that platform and the extension used by asm files.
 OS_ARCH_COMBOS = [
-    ('ios', 'arm', 'ios32', [], 'S'),
-    ('ios', 'aarch64', 'ios64', [], 'S'),
+    ('apple', 'arm', 'ios32', [], 'S'),
+    ('apple', 'aarch64', 'ios64', [], 'S'),
+    ('apple', 'x86', 'macosx', ['-fPIC', '-DOPENSSL_IA32_SSE2'], 'S'),
+    ('apple', 'x86_64', 'macosx', [], 'S'),
     ('linux', 'arm', 'linux32', [], 'S'),
     ('linux', 'aarch64', 'linux64', [], 'S'),
     ('linux', 'ppc64le', 'linux64le', [], 'S'),
     ('linux', 'x86', 'elf', ['-fPIC', '-DOPENSSL_IA32_SSE2'], 'S'),
     ('linux', 'x86_64', 'elf', [], 'S'),
-    ('mac', 'x86', 'macosx', ['-fPIC', '-DOPENSSL_IA32_SSE2'], 'S'),
-    ('mac', 'x86_64', 'macosx', [], 'S'),
     ('win', 'x86', 'win32n', ['-DOPENSSL_IA32_SSE2'], 'asm'),
     ('win', 'x86_64', 'nasm', [], 'asm'),
     ('win', 'aarch64', 'win64', [], 'S'),
@@ -361,10 +361,6 @@ class GN(object):
       self.PrintVariableSection(out, 'tool_sources',
                                 files['tool'] + files['tool_headers'])
 
-      # OQS note: This is for building with Chromium.
-      self.PrintVariableSection(out, 'oqs_headers',
-                                files['oqs_headers'])
-
       for ((osname, arch), asm_files) in asm_outputs:
         self.PrintVariableSection(
             out, 'crypto_sources_%s_%s' % (osname, arch), asm_files)
@@ -441,7 +437,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fvisibility=hidden -fno-common -fno-exceptions -fno-rtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fvisibility=hidden -fno-common -fno-exceptions -fno-rtti")
   if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
   endif()
@@ -590,12 +586,8 @@ include_directories(src/include)
             asm_files)
 
       cmake.write(
-R'''if(APPLE AND ARCH STREQUAL "aarch64")
-  set(CRYPTO_ARCH_SOURCES ${CRYPTO_ios_aarch64_SOURCES})
-elseif(APPLE AND ARCH STREQUAL "arm")
-  set(CRYPTO_ARCH_SOURCES ${CRYPTO_ios_arm_SOURCES})
-elseif(APPLE)
-  set(CRYPTO_ARCH_SOURCES ${CRYPTO_mac_${ARCH}_SOURCES})
+R'''if(APPLE)
+  set(CRYPTO_ARCH_SOURCES ${CRYPTO_apple_${ARCH}_SOURCES})
 elseif(UNIX)
   set(CRYPTO_ARCH_SOURCES ${CRYPTO_linux_${ARCH}_SOURCES})
 elseif(WIN32)
@@ -930,9 +922,8 @@ def main(platforms):
                                    NotSSLHeaderFiles)
 
   ssl_internal_h_files = FindHeaderFiles(os.path.join('src', 'ssl'), NoTests)
-  # OQS note: This is for building with Chromium.
-  oqs_h_files = FindHeaderFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
   crypto_internal_h_files = (
+      FindHeaderFiles(os.path.join('src', 'crypto'), NoTests) +
       FindHeaderFiles(os.path.join('src', 'third_party', 'fiat'), NoTests))
 
   files = {
@@ -953,7 +944,6 @@ def main(platforms):
       'test_support': test_support_c_files,
       'test_support_headers': test_support_h_files,
       'urandom_test': urandom_test_files,
-      'oqs_headers': oqs_h_files,
   }
 
   asm_outputs = sorted(WriteAsmFiles(ReadPerlAsmOperations()).items())
