@@ -24,6 +24,11 @@ load(
     "crypto_sources_linux_ppc64le",
     "crypto_sources_linux_x86_64",
     "fips_fragments",
+
+    "oqs_sources",
+    "oqs_headers",
+    "oqs_internal_headers",
+
     "ssl_headers",
     "ssl_internal_headers",
     "ssl_sources",

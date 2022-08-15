@@ -522,6 +522,38 @@ tool_headers = [
     "src/tool/transport_common.h",
 ]
 
+oqs_sources = [
+]
+
+oqs_headers = [
+]
+
+oqs_internal_headers = [
+    "src/oqs/include/oqs/aes.h",
+    "src/oqs/include/oqs/common.h",
+    "src/oqs/include/oqs/kem.h",
+    "src/oqs/include/oqs/kem_bike.h",
+    "src/oqs/include/oqs/kem_classic_mceliece.h",
+    "src/oqs/include/oqs/kem_frodokem.h",
+    "src/oqs/include/oqs/kem_hqc.h",
+    "src/oqs/include/oqs/kem_kyber.h",
+    "src/oqs/include/oqs/kem_ntru.h",
+    "src/oqs/include/oqs/kem_ntruprime.h",
+    "src/oqs/include/oqs/kem_saber.h",
+    "src/oqs/include/oqs/oqs.h",
+    "src/oqs/include/oqs/oqsconfig.h",
+    "src/oqs/include/oqs/rand.h",
+    "src/oqs/include/oqs/sha2.h",
+    "src/oqs/include/oqs/sha3.h",
+    "src/oqs/include/oqs/sha3x4.h",
+    "src/oqs/include/oqs/sig.h",
+    "src/oqs/include/oqs/sig_dilithium.h",
+    "src/oqs/include/oqs/sig_falcon.h",
+    "src/oqs/include/oqs/sig_picnic.h",
+    "src/oqs/include/oqs/sig_rainbow.h",
+    "src/oqs/include/oqs/sig_sphincs.h",
+]
+
 crypto_sources_apple_aarch64 = [
     "apple-aarch64/crypto/chacha/chacha-armv8.S",
     "apple-aarch64/crypto/fipsmodule/aesv8-armx64.S",

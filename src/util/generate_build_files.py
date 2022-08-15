@@ -252,6 +252,11 @@ class Bazel(object):
       self.PrintVariableSection(out, 'tool_sources', files['tool'])
       self.PrintVariableSection(out, 'tool_headers', files['tool_headers'])
 
+      # oqs variables
+      self.PrintVariableSection(out, 'oqs_sources', files['oqs'])
+      self.PrintVariableSection(out, 'oqs_headers', files['oqs_headers'])
+      self.PrintVariableSection(out, 'oqs_internal_headers', files['oqs_internal_headers'])
+
       for ((osname, arch), asm_files) in asm_outputs:
         self.PrintVariableSection(
             out, 'crypto_sources_%s_%s' % (osname, arch), asm_files)
@@ -853,6 +858,7 @@ def main(platforms):
   crypto_c_files = (FindCFiles(os.path.join('src', 'crypto'), NoTestsNorFIPSFragments) +
                     FindCFiles(os.path.join('src', 'third_party', 'fiat'), NoTestsNorFIPSFragments))
   fips_fragments = FindCFiles(os.path.join('src', 'crypto', 'fipsmodule'), OnlyFIPSFragments)
+  oqs_source_files = FindCFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
   ssl_source_files = FindCFiles(os.path.join('src', 'ssl'), NoTests)
   tool_c_files = FindCFiles(os.path.join('src', 'tool'), NoTests)
   tool_h_files = FindHeaderFiles(os.path.join('src', 'tool'), AllFiles)
@@ -916,12 +922,17 @@ def main(platforms):
   ssl_h_files = FindHeaderFiles(os.path.join('src', 'include', 'openssl'),
                                 SSLHeaderFiles)
 
+  oqs_h_files = FindHeaderFiles(os.path.join('src', 'oqs', 'include', 'oqs'),
+                                SSLHeaderFiles)
+
   def NotSSLHeaderFiles(path, filename, is_dir):
     return not SSLHeaderFiles(path, filename, is_dir)
   crypto_h_files = FindHeaderFiles(os.path.join('src', 'include', 'openssl'),
                                    NotSSLHeaderFiles)
 
   ssl_internal_h_files = FindHeaderFiles(os.path.join('src', 'ssl'), NoTests)
+  oqs_internal_h_files = FindHeaderFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
+
   crypto_internal_h_files = (
       FindHeaderFiles(os.path.join('src', 'crypto'), NoTests) +
       FindHeaderFiles(os.path.join('src', 'third_party', 'fiat'), NoTests))
@@ -935,6 +946,12 @@ def main(platforms):
       'crypto_test_data': sorted('src/' + x for x in cmake['CRYPTO_TEST_DATA']),
       'fips_fragments': fips_fragments,
       'fuzz': fuzz_c_files,
+
+      # values added for oqs library
+      'oqs': oqs_source_files,
+      'oqs_headers': oqs_h_files,
+      'oqs_internal_headers': oqs_internal_h_files,
+
       'ssl': ssl_source_files,
       'ssl_headers': ssl_h_files,
       'ssl_internal_headers': ssl_internal_h_files,
