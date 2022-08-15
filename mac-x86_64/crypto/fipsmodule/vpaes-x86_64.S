@@ -1,5 +1,5 @@
-# This file is generated from a similarly-named Perl script in the BoringSSL
-# source tree. Do not edit by hand.
+// This file is generated from a similarly-named Perl script in the BoringSSL
+// source tree. Do not edit by hand.
 
 #if defined(__has_feature)
 #if __has_feature(memory_sanitizer) && !defined(OPENSSL_NO_ASM)
@@ -812,11 +812,9 @@ L$schedule_mangle_both:
 .p2align	4
 _vpaes_set_encrypt_key:
 
-#ifndef NDEBUG
-#ifndef BORINGSSL_FIPS
+#ifdef BORINGSSL_DISPATCH_TEST
 
 	movb	$1,_BORINGSSL_function_hit+5(%rip)
-#endif
 #endif
 
 	movl	%esi,%eax
@@ -862,11 +860,9 @@ _vpaes_set_decrypt_key:
 .p2align	4
 _vpaes_encrypt:
 
-#ifndef NDEBUG
-#ifndef BORINGSSL_FIPS
+#ifdef BORINGSSL_DISPATCH_TEST
 
 	movb	$1,_BORINGSSL_function_hit+4(%rip)
-#endif
 #endif
 	movdqu	(%rdi),%xmm0
 	call	_vpaes_preheat

@@ -1,12 +1,12 @@
-# This file is generated from a similarly-named Perl script in the BoringSSL
-# source tree. Do not edit by hand.
+// This file is generated from a similarly-named Perl script in the BoringSSL
+// source tree. Do not edit by hand.
 
 #if defined(__i386__)
 #if defined(BORINGSSL_PREFIX)
 #include <boringssl_prefix_symbols_asm.h>
 #endif
 .text
-#ifndef NDEBUG
+#ifdef BORINGSSL_DISPATCH_TEST
 #endif
 .align	6,0x90
 L_vpaes_consts:
@@ -468,7 +468,7 @@ L_vpaes_set_encrypt_key_begin:
 	pushl	%ebx
 	pushl	%esi
 	pushl	%edi
-#ifndef NDEBUG
+#ifdef BORINGSSL_DISPATCH_TEST
 	pushl	%ebx
 	pushl	%edx
 	call	L016pic
@@ -549,7 +549,7 @@ L_vpaes_encrypt_begin:
 	pushl	%ebx
 	pushl	%esi
 	pushl	%edi
-#ifndef NDEBUG
+#ifdef BORINGSSL_DISPATCH_TEST
 	pushl	%ebx
 	pushl	%edx
 	call	L019pic

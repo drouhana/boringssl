@@ -1,5 +1,5 @@
-# This file is generated from a similarly-named Perl script in the BoringSSL
-# source tree. Do not edit by hand.
+// This file is generated from a similarly-named Perl script in the BoringSSL
+// source tree. Do not edit by hand.
 
 #if defined(__has_feature)
 #if __has_feature(memory_sanitizer) && !defined(OPENSSL_NO_ASM)
@@ -3970,3 +3970,4 @@ sha256_block_data_order_avx:
 .cfi_endproc	
 .size	sha256_block_data_order_avx,.-sha256_block_data_order_avx
 #endif
+.section	.note.GNU-stack,"",@progbits
