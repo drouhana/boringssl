@@ -577,6 +577,9 @@ oqs_internal_headers = [
     "src/oqs/include/oqs/sig_sphincs.h",
 ]
 
+oqs_fragments = [
+]
+
 crypto_sources_apple_aarch64 = [
     "apple-aarch64/crypto/chacha/chacha-armv8.S",
     "apple-aarch64/crypto/fipsmodule/aesv8-armx64.S",

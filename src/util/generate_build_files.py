@@ -256,6 +256,7 @@ class Bazel(object):
       self.PrintVariableSection(out, 'oqs_sources', files['oqs'])
       self.PrintVariableSection(out, 'oqs_headers', files['oqs_headers'])
       self.PrintVariableSection(out, 'oqs_internal_headers', files['oqs_internal_headers'])
+      self.PrintVariableSection(out, 'oqs_fragments', files['oqs_fragments'])
 
       for ((osname, arch), asm_files) in asm_outputs:
         self.PrintVariableSection(
@@ -860,6 +861,7 @@ def main(platforms):
   fips_fragments = FindCFiles(os.path.join('src', 'crypto', 'fipsmodule'), OnlyFIPSFragments)
 
   oqs_source_files = FindCFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
+  oqs_fragments = FindCFiles(os.path.join('src', 'oqs_template'), AllFiles)
   
   ssl_source_files = FindCFiles(os.path.join('src', 'ssl'), NoTests)
   tool_c_files = FindCFiles(os.path.join('src', 'tool'), NoTests)
@@ -953,6 +955,7 @@ def main(platforms):
       'oqs': oqs_source_files,
       'oqs_headers': oqs_h_files,
       'oqs_internal_headers': oqs_internal_h_files,
+      'oqs_fragments': oqs_fragments,
 
       'ssl': ssl_source_files,
       'ssl_headers': ssl_h_files,

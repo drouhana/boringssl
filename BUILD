@@ -28,6 +28,7 @@ load(
     "oqs_sources",
     "oqs_headers",
     "oqs_internal_headers",
+    "oqs_fragments",
 
     "ssl_headers",
     "ssl_internal_headers",
@@ -158,8 +159,8 @@ boringssl_copts_cxx = boringssl_copts + select({
 
 cc_library(
     name = "crypto",
-    srcs = crypto_sources + crypto_internal_headers + crypto_sources_asm + oqs_internal_headers,
-    hdrs = crypto_headers + fips_fragments + oqs_headers,
+    srcs = crypto_sources + crypto_internal_headers + crypto_sources_asm + ssl_sources + ssl_internal_headers + oqs_sources + oqs_internal_headers,
+    hdrs = crypto_headers + fips_fragments + ssl_headers + oqs_headers + oqs_fragments,
     copts = boringssl_copts_c11,
     includes = [
         "src/include",
@@ -179,8 +180,8 @@ cc_library(
 
 cc_library(
     name = "ssl",
-    srcs = ssl_sources + ssl_internal_headers + oqs_sources + oqs_internal_headers,
-    hdrs = ssl_headers + oqs_headers,
+    srcs = crypto_sources + crypto_internal_headers + crypto_sources_asm + ssl_sources + ssl_internal_headers + oqs_sources + oqs_internal_headers,
+    hdrs = crypto_headers + fips_fragments + ssl_headers + oqs_headers + oqs_fragments,
     copts = boringssl_copts_cxx,
     includes = [
         "src/include",
