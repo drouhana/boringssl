@@ -12,26 +12,28 @@
 # OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
-licenses(["notice"])
-
-exports_files(["LICENSE"])
-
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load(
     ":BUILD.generated.bzl",
     "crypto_headers",
     "crypto_internal_headers",
     "crypto_sources",
-    "crypto_sources_linux_x86_64",
+    "crypto_sources_apple_aarch64",
+    "crypto_sources_apple_x86_64",
+    "crypto_sources_linux_aarch64",
     "crypto_sources_linux_ppc64le",
-    "crypto_sources_mac_x86_64",
+    "crypto_sources_linux_x86_64",
     "fips_fragments",
     "ssl_headers",
     "ssl_internal_headers",
     "ssl_sources",
-    "tool_sources",
     "tool_headers",
+    "tool_sources",
 )
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
 
 config_setting(
     name = "linux_aarch64",
@@ -78,9 +80,6 @@ posix_copts = [
     # ensure that binaries can be built with non-executable stack.
     "-Wa,--noexecstack",
 
-    # This is needed on Linux systems (at least) to get rwlock in pthread.
-    "-D_XOPEN_SOURCE=700",
-
     # This list of warnings should match those in the top-level CMakeLists.txt.
     "-Wall",
     "-Werror",
@@ -90,11 +89,6 @@ posix_copts = [
     "-Wwrite-strings",
     "-Wshadow",
     "-fno-common",
-
-    # Modern build environments should be able to set this to use atomic
-    # operations for reference counting rather than locks. However, it's
-    # known not to work on some Android builds.
-    # "-DOPENSSL_C11_ATOMIC",
 ]
 
 linux_copts = posix_copts + [
@@ -107,7 +101,9 @@ linux_copts = posix_copts + [
 boringssl_copts = select({
     "@platforms//os:linux": linux_copts,
     "@platforms//os:macos": posix_copts,
-    "@platforms//os:windows": ["-DWIN32_LEAN_AND_MEAN"],
+    "@platforms//os:windows": [
+        "-DWIN32_LEAN_AND_MEAN",
+        "-DBORINGSSL_IMPLEMENTATION",],
     "//conditions:default": [],
 })
 
@@ -169,6 +165,7 @@ cc_library(
         "@platforms//os:windows": ["-defaultlib:advapi32.lib"],
         "//conditions:default": ["-lpthread"],
     }),
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
@@ -179,6 +176,7 @@ cc_library(
     copts = boringssl_copts_cxx,
     includes = ["src/include"],
     visibility = ["//visibility:public"],
+    linkstatic = True,
     deps = [
         ":crypto",
     ],
