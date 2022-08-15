@@ -16,6 +16,7 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load(
     ":BUILD.generated.bzl",
     "crypto_headers",
@@ -33,28 +34,43 @@ load(
 )
 
 config_setting(
+    name = "linux_aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+config_setting(
     name = "linux_x86_64",
-    values = {"cpu": "k8"},
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
 )
 
 config_setting(
     name = "linux_ppc64le",
-    values = {"cpu": "ppc"},
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:ppc",
+    ],
 )
 
 config_setting(
-    name = "mac_x86_64",
-    values = {"cpu": "darwin"},
+    name = "macos_aarch64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:aarch64",
+    ],
 )
 
 config_setting(
-    name = "windows_x86_64",
-    values = {"cpu": "x64_windows"},
-)
-
-config_setting(
-    name = "android",
-    values = {"crosstool_top": "//external:android/crosstool"}
+    name = "macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
 )
 
 posix_copts = [
@@ -81,22 +97,36 @@ posix_copts = [
     # "-DOPENSSL_C11_ATOMIC",
 ]
 
+linux_copts = posix_copts + [
+    # This is needed on Linux systems (at least) to get rwlock in pthread, but
+    # it should not be set on Apple platforms, where it instead disables APIs
+    # we use. See compat(5) and sys/cdefs.h.
+    "-D_XOPEN_SOURCE=700",
+]
+
 boringssl_copts = select({
-    ":linux_x86_64": posix_copts,
-    ":linux_ppc64le": posix_copts,
-    ":mac_x86_64": posix_copts,
-    ":windows_x86_64": [
-        "-DWIN32_LEAN_AND_MEAN",
-        "-DOPENSSL_NO_ASM",
-    ],
-    "//conditions:default": ["-DOPENSSL_NO_ASM"],
+    "@platforms//os:linux": linux_copts,
+    "@platforms//os:macos": posix_copts,
+    "@platforms//os:windows": ["-DWIN32_LEAN_AND_MEAN"],
+    "//conditions:default": [],
 })
 
+# These selects must be kept in sync.
 crypto_sources_asm = select({
-    ":linux_x86_64": crypto_sources_linux_x86_64,
+    ":linux_aarch64": crypto_sources_linux_aarch64,
     ":linux_ppc64le": crypto_sources_linux_ppc64le,
-    ":mac_x86_64": crypto_sources_mac_x86_64,
+    ":linux_x86_64": crypto_sources_linux_x86_64,
+    ":macos_aarch64": crypto_sources_apple_aarch64,
+    ":macos_x86_64": crypto_sources_apple_x86_64,
     "//conditions:default": [],
+})
+boringssl_copts += select({
+    ":linux_aarch64": [],
+    ":linux_ppc64le": [],
+    ":linux_x86_64": [],
+    ":macos_aarch64": [],
+    ":macos_x86_64": [],
+    "//conditions:default": ["-DOPENSSL_NO_ASM"],
 })
 
 # For C targets only (not C++), compile with C11 support.
@@ -108,9 +138,8 @@ posix_copts_c11 = [
 ]
 
 boringssl_copts_c11 = boringssl_copts + select({
-    ":linux_x86_64": posix_copts_c11,
-    ":linux_ppc64le": posix_copts_c11,
-    ":mac_x86_64": posix_copts_c11,
+    "@platforms//os:linux": posix_copts_c11,
+    "@platforms//os:macos": posix_copts_c11,
     "//conditions:default": [],
 })
 
@@ -121,9 +150,8 @@ posix_copts_cxx = [
 ]
 
 boringssl_copts_cxx = boringssl_copts + select({
-    ":linux_x86_64": posix_copts_cxx,
-    ":linux_ppc64le": posix_copts_cxx,
-    ":mac_x86_64": posix_copts_cxx,
+    "@platforms//os:linux": posix_copts_cxx,
+    "@platforms//os:macos": posix_copts_cxx,
     "//conditions:default": [],
 })
 
@@ -134,11 +162,11 @@ cc_library(
     copts = boringssl_copts_c11,
     includes = ["src/include"],
     linkopts = select({
-        ":mac_x86_64": [],
         # Android supports pthreads, but does not provide a libpthread
         # to link against.
-        ":android": [],
-        ":windows_x86_64": ["-defaultlib:advapi32.lib"],
+        "@platforms//os:android": [],
+        "@platforms//os:macos": [],
+        "@platforms//os:windows": ["-defaultlib:advapi32.lib"],
         "//conditions:default": ["-lpthread"],
     }),
     visibility = ["//visibility:public"],
