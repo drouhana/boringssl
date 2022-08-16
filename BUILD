@@ -147,7 +147,7 @@ boringssl_copts_c11 = boringssl_copts + select({
 
 
 posix_copts_cxx = [
-    "-std=c++14",
+    "-std=c++11",
     "-Wmissing-declarations",
 ]
 
