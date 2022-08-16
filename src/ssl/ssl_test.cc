@@ -564,62 +564,6 @@ static const CurveTest kCurveTests[] = {
     },
   },
   {
-    "sidhp434:p256_sidhp434",
-    {
-      SSL_CURVE_SIDHP434,
-      SSL_CURVE_P256_SIDHP434,
-    },
-  },
-  {
-    "sidhp503:p256_sidhp503",
-    {
-      SSL_CURVE_SIDHP503,
-      SSL_CURVE_P256_SIDHP503,
-    },
-  },
-  {
-    "sidhp610:p384_sidhp610",
-    {
-      SSL_CURVE_SIDHP610,
-      SSL_CURVE_P384_SIDHP610,
-    },
-  },
-  {
-    "sidhp751:p521_sidhp751",
-    {
-      SSL_CURVE_SIDHP751,
-      SSL_CURVE_P521_SIDHP751,
-    },
-  },
-  {
-    "sikep434:p256_sikep434",
-    {
-      SSL_CURVE_SIKEP434,
-      SSL_CURVE_P256_SIKEP434,
-    },
-  },
-  {
-    "sikep503:p256_sikep503",
-    {
-      SSL_CURVE_SIKEP503,
-      SSL_CURVE_P256_SIKEP503,
-    },
-  },
-  {
-    "sikep610:p384_sikep610",
-    {
-      SSL_CURVE_SIKEP610,
-      SSL_CURVE_P384_SIKEP610,
-    },
-  },
-  {
-    "sikep751:p521_sikep751",
-    {
-      SSL_CURVE_SIKEP751,
-      SSL_CURVE_P521_SIKEP751,
-    },
-  },
-  {
     "kyber90s512:p256_kyber90s512",
     {
       SSL_CURVE_KYBER90S512,
@@ -5404,12 +5348,6 @@ TEST(SSLTest, SignatureAlgorithmProperties) {
             SSL_get_signature_algorithm_key_type(SSL_SIGN_PICNIC3L3));
   EXPECT_EQ(EVP_PKEY_PICNIC3L5,
             SSL_get_signature_algorithm_key_type(SSL_SIGN_PICNIC3L5));
-  EXPECT_EQ(EVP_PKEY_RAINBOWICLASSIC,
-            SSL_get_signature_algorithm_key_type(SSL_SIGN_RAINBOWICLASSIC));
-  EXPECT_EQ(EVP_PKEY_RAINBOWICIRCUMZENITHAL,
-            SSL_get_signature_algorithm_key_type(SSL_SIGN_RAINBOWICIRCUMZENITHAL));
-  EXPECT_EQ(EVP_PKEY_RAINBOWICOMPRESSED,
-            SSL_get_signature_algorithm_key_type(SSL_SIGN_RAINBOWICOMPRESSED));
   EXPECT_EQ(EVP_PKEY_RAINBOWIIICLASSIC,
             SSL_get_signature_algorithm_key_type(SSL_SIGN_RAINBOWIIICLASSIC));
   EXPECT_EQ(EVP_PKEY_RAINBOWIIICIRCUMZENITHAL,
@@ -5790,9 +5728,6 @@ TEST(SSLTest, SigAlgs) {
       {{NID_sha256, EVP_PKEY_PICNIC3L1}, true, {SSL_SIGN_PICNIC3L1}},
       {{NID_sha384, EVP_PKEY_PICNIC3L3}, true, {SSL_SIGN_PICNIC3L3}},
       {{NID_sha512, EVP_PKEY_PICNIC3L5}, true, {SSL_SIGN_PICNIC3L5}},
-      {{NID_sha256, EVP_PKEY_RAINBOWICLASSIC}, true, {SSL_SIGN_RAINBOWICLASSIC}},
-      {{NID_sha256, EVP_PKEY_RAINBOWICIRCUMZENITHAL}, true, {SSL_SIGN_RAINBOWICIRCUMZENITHAL}},
-      {{NID_sha256, EVP_PKEY_RAINBOWICOMPRESSED}, true, {SSL_SIGN_RAINBOWICOMPRESSED}},
       {{NID_sha384, EVP_PKEY_RAINBOWIIICLASSIC}, true, {SSL_SIGN_RAINBOWIIICLASSIC}},
       {{NID_sha384, EVP_PKEY_RAINBOWIIICIRCUMZENITHAL}, true, {SSL_SIGN_RAINBOWIIICIRCUMZENITHAL}},
       {{NID_sha384, EVP_PKEY_RAINBOWIIICOMPRESSED}, true, {SSL_SIGN_RAINBOWIIICOMPRESSED}},
@@ -5906,9 +5841,6 @@ TEST(SSLTest, SigAlgsList) {
       {"picnic3l1", true, {SSL_SIGN_PICNIC3L1}},
       {"picnic3l3", true, {SSL_SIGN_PICNIC3L3}},
       {"picnic3l5", true, {SSL_SIGN_PICNIC3L5}},
-      {"rainbowIclassic", true, {SSL_SIGN_RAINBOWICLASSIC}},
-      {"rainbowIcircumzenithal", true, {SSL_SIGN_RAINBOWICIRCUMZENITHAL}},
-      {"rainbowIcompressed", true, {SSL_SIGN_RAINBOWICOMPRESSED}},
       {"rainbowIIIclassic", true, {SSL_SIGN_RAINBOWIIICLASSIC}},
       {"rainbowIIIcircumzenithal", true, {SSL_SIGN_RAINBOWIIICIRCUMZENITHAL}},
       {"rainbowIIIcompressed", true, {SSL_SIGN_RAINBOWIIICOMPRESSED}},
@@ -8179,22 +8111,6 @@ static const TLSGroup kOQSGroups[] = {
     {NID_p384_saber, SSL_CURVE_P384_SABER},
     {NID_firesaber, SSL_CURVE_FIRESABER},
     {NID_p521_firesaber, SSL_CURVE_P521_FIRESABER},
-    {NID_sidhp434, SSL_CURVE_SIDHP434},
-    {NID_p256_sidhp434, SSL_CURVE_P256_SIDHP434},
-    {NID_sidhp503, SSL_CURVE_SIDHP503},
-    {NID_p256_sidhp503, SSL_CURVE_P256_SIDHP503},
-    {NID_sidhp610, SSL_CURVE_SIDHP610},
-    {NID_p384_sidhp610, SSL_CURVE_P384_SIDHP610},
-    {NID_sidhp751, SSL_CURVE_SIDHP751},
-    {NID_p521_sidhp751, SSL_CURVE_P521_SIDHP751},
-    {NID_sikep434, SSL_CURVE_SIKEP434},
-    {NID_p256_sikep434, SSL_CURVE_P256_SIKEP434},
-    {NID_sikep503, SSL_CURVE_SIKEP503},
-    {NID_p256_sikep503, SSL_CURVE_P256_SIKEP503},
-    {NID_sikep610, SSL_CURVE_SIKEP610},
-    {NID_p384_sikep610, SSL_CURVE_P384_SIKEP610},
-    {NID_sikep751, SSL_CURVE_SIKEP751},
-    {NID_p521_sikep751, SSL_CURVE_P521_SIKEP751},
     {NID_kyber90s512, SSL_CURVE_KYBER90S512},
     {NID_p256_kyber90s512, SSL_CURVE_P256_KYBER90S512},
     {NID_kyber90s768, SSL_CURVE_KYBER90S768},
@@ -8322,9 +8238,6 @@ INSTANTIATE_TEST_SUITE_P(WithSignatureNIDs, OQSHandshakeTest,
                             NID_picnic3l1,
                             NID_picnic3l3,
                             NID_picnic3l5,
-                            NID_rainbowIclassic,
-                            NID_rainbowIcircumzenithal,
-                            NID_rainbowIcompressed,
                             NID_rainbowIIIclassic,
                             NID_rainbowIIIcircumzenithal,
                             NID_rainbowIIIcompressed,
