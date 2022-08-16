@@ -1398,22 +1398,6 @@ secg-scheme 14 3 : dhSinglePass-cofactorDH-sha512kdf-scheme
  : p384_saber
  : firesaber
  : p521_firesaber
- : sidhp434
- : p256_sidhp434
- : sidhp503
- : p256_sidhp503
- : sidhp610
- : p384_sidhp610
- : sidhp751
- : p521_sidhp751
- : sikep434
- : p256_sikep434
- : sikep503
- : p256_sikep503
- : sikep610
- : p384_sikep610
- : sikep751
- : p521_sikep751
  : kyber90s512
  : p256_kyber90s512
  : kyber90s768
@@ -1459,9 +1443,6 @@ secg-scheme 14 3 : dhSinglePass-cofactorDH-sha512kdf-scheme
 1 3 6 1 4 1 311 89 2 1 21 : picnic3l1 : picnic3l1
 1 3 6 1 4 1 311 89 2 1 24 : picnic3l3 : picnic3l3
 1 3 6 1 4 1 311 89 2 1 26 : picnic3l5 : picnic3l5
-1 3 9999 5 1 1 1 : rainbowIclassic : rainbowIclassic
-1 3 9999 5 1 4 1 : rainbowIcircumzenithal : rainbowIcircumzenithal
-1 3 9999 5 1 7 1 : rainbowIcompressed : rainbowIcompressed
 1 3 9999 5 2 1 1 : rainbowIIIclassic : rainbowIIIclassic
 1 3 9999 5 2 3 1 : rainbowIIIcircumzenithal : rainbowIIIcircumzenithal
 1 3 9999 5 2 5 1 : rainbowIIIcompressed : rainbowIIIcompressed
