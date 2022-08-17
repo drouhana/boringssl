@@ -65,69 +65,13 @@
 #include "../internal.h"
 #include "internal.h"
 
+
 static const EVP_PKEY_METHOD *const evp_methods[] = {
     &rsa_pkey_meth,
     &ec_pkey_meth,
     &ed25519_pkey_meth,
     &x25519_pkey_meth,
-///// OQS_TEMPLATE_FRAGMENT_LIST_PKEY_METHS_START
-    &dilithium2_pkey_meth,
-    &dilithium3_pkey_meth,
-    &dilithium5_pkey_meth,
-    &dilithium2_aes_pkey_meth,
-    &dilithium3_aes_pkey_meth,
-    &dilithium5_aes_pkey_meth,
-    &falcon512_pkey_meth,
-    &falcon1024_pkey_meth,
-    &picnicl1fs_pkey_meth,
-    &picnicl1ur_pkey_meth,
-    &picnicl1full_pkey_meth,
-    &picnic3l1_pkey_meth,
-    &picnic3l3_pkey_meth,
-    &picnic3l5_pkey_meth,
-    &rainbowIIIclassic_pkey_meth,
-    &rainbowIIIcircumzenithal_pkey_meth,
-    &rainbowIIIcompressed_pkey_meth,
-    &rainbowVclassic_pkey_meth,
-    &rainbowVcircumzenithal_pkey_meth,
-    &rainbowVcompressed_pkey_meth,
-    &sphincsharaka128frobust_pkey_meth,
-    &sphincsharaka128fsimple_pkey_meth,
-    &sphincsharaka128srobust_pkey_meth,
-    &sphincsharaka128ssimple_pkey_meth,
-    &sphincsharaka192frobust_pkey_meth,
-    &sphincsharaka192fsimple_pkey_meth,
-    &sphincsharaka192srobust_pkey_meth,
-    &sphincsharaka192ssimple_pkey_meth,
-    &sphincsharaka256frobust_pkey_meth,
-    &sphincsharaka256fsimple_pkey_meth,
-    &sphincsharaka256srobust_pkey_meth,
-    &sphincsharaka256ssimple_pkey_meth,
-    &sphincssha256128frobust_pkey_meth,
-    &sphincssha256128fsimple_pkey_meth,
-    &sphincssha256128srobust_pkey_meth,
-    &sphincssha256128ssimple_pkey_meth,
-    &sphincssha256192frobust_pkey_meth,
-    &sphincssha256192fsimple_pkey_meth,
-    &sphincssha256192srobust_pkey_meth,
-    &sphincssha256192ssimple_pkey_meth,
-    &sphincssha256256frobust_pkey_meth,
-    &sphincssha256256fsimple_pkey_meth,
-    &sphincssha256256srobust_pkey_meth,
-    &sphincssha256256ssimple_pkey_meth,
-    &sphincsshake256128frobust_pkey_meth,
-    &sphincsshake256128fsimple_pkey_meth,
-    &sphincsshake256128srobust_pkey_meth,
-    &sphincsshake256128ssimple_pkey_meth,
-    &sphincsshake256192frobust_pkey_meth,
-    &sphincsshake256192fsimple_pkey_meth,
-    &sphincsshake256192srobust_pkey_meth,
-    &sphincsshake256192ssimple_pkey_meth,
-    &sphincsshake256256frobust_pkey_meth,
-    &sphincsshake256256fsimple_pkey_meth,
-    &sphincsshake256256srobust_pkey_meth,
-    &sphincsshake256256ssimple_pkey_meth,
-///// OQS_TEMPLATE_FRAGMENT_LIST_PKEY_METHS_END
+    &hkdf_pkey_meth,
 };
 
 static const EVP_PKEY_METHOD *evp_pkey_meth_find(int type) {
@@ -140,26 +84,9 @@ static const EVP_PKEY_METHOD *evp_pkey_meth_find(int type) {
   return NULL;
 }
 
-static EVP_PKEY_CTX *evp_pkey_ctx_new(EVP_PKEY *pkey, ENGINE *e, int id) {
-  EVP_PKEY_CTX *ret;
-  const EVP_PKEY_METHOD *pmeth;
-
-  if (id == -1) {
-    if (!pkey || !pkey->ameth) {
-      return NULL;
-    }
-    id = pkey->ameth->pkey_id;
-  }
-
-  pmeth = evp_pkey_meth_find(id);
-
-  if (pmeth == NULL) {
-    OPENSSL_PUT_ERROR(EVP, EVP_R_UNSUPPORTED_ALGORITHM);
-    ERR_add_error_dataf("algorithm %d", id);
-    return NULL;
-  }
-
-  ret = OPENSSL_malloc(sizeof(EVP_PKEY_CTX));
+static EVP_PKEY_CTX *evp_pkey_ctx_new(EVP_PKEY *pkey, ENGINE *e,
+                                      const EVP_PKEY_METHOD *pmeth) {
+  EVP_PKEY_CTX *ret = OPENSSL_malloc(sizeof(EVP_PKEY_CTX));
   if (!ret) {
     OPENSSL_PUT_ERROR(EVP, ERR_R_MALLOC_FAILURE);
     return NULL;
@@ -187,11 +114,30 @@ static EVP_PKEY_CTX *evp_pkey_ctx_new(EVP_PKEY *pkey, ENGINE *e, int id) {
 }
 
 EVP_PKEY_CTX *EVP_PKEY_CTX_new(EVP_PKEY *pkey, ENGINE *e) {
-  return evp_pkey_ctx_new(pkey, e, -1);
+  if (pkey == NULL || pkey->ameth == NULL) {
+    OPENSSL_PUT_ERROR(EVP, ERR_R_PASSED_NULL_PARAMETER);
+    return NULL;
+  }
+
+  const EVP_PKEY_METHOD *pkey_method = pkey->ameth->pkey_method;
+  if (pkey_method == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_UNSUPPORTED_ALGORITHM);
+    ERR_add_error_dataf("algorithm %d", pkey->ameth->pkey_id);
+    return NULL;
+  }
+
+  return evp_pkey_ctx_new(pkey, e, pkey_method);
 }
 
 EVP_PKEY_CTX *EVP_PKEY_CTX_new_id(int id, ENGINE *e) {
-  return evp_pkey_ctx_new(NULL, e, id);
+  const EVP_PKEY_METHOD *pkey_method = evp_pkey_meth_find(id);
+  if (pkey_method == NULL) {
+    OPENSSL_PUT_ERROR(EVP, EVP_R_UNSUPPORTED_ALGORITHM);
+    ERR_add_error_dataf("algorithm %d", id);
+    return NULL;
+  }
+
+  return evp_pkey_ctx_new(NULL, e, pkey_method);
 }
 
 void EVP_PKEY_CTX_free(EVP_PKEY_CTX *ctx) {

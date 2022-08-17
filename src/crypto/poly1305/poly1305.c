@@ -18,6 +18,7 @@
 
 #include <openssl/poly1305.h>
 
+#include <assert.h>
 #include <string.h>
 
 #include "internal.h"
@@ -48,7 +49,7 @@ struct poly1305_state_st {
   uint8_t key[16];
 };
 
-OPENSSL_STATIC_ASSERT(
+static_assert(
     sizeof(struct poly1305_state_st) + 63 <= sizeof(poly1305_state),
     "poly1305_state isn't large enough to hold aligned poly1305_state_st");
 
@@ -203,6 +204,11 @@ void CRYPTO_poly1305_init(poly1305_state *statep, const uint8_t key[32]) {
 void CRYPTO_poly1305_update(poly1305_state *statep, const uint8_t *in,
                             size_t in_len) {
   struct poly1305_state_st *state = poly1305_aligned_state(statep);
+
+  // Work around a C language bug. See https://crbug.com/1019588.
+  if (in_len == 0) {
+    return;
+  }
 
 #if defined(OPENSSL_POLY1305_NEON)
   if (CRYPTO_is_NEON_capable()) {

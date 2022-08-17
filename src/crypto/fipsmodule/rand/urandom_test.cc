@@ -15,13 +15,13 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
+#include <openssl/ctrdrbg.h>
 #include <openssl/rand.h>
 
 #include "internal.h"
 #include "getrandom_fillin.h"
 
-// OQS note: Check top level CMakeLists.txt for the reason for OQS_RUN_URANDOM_TESTS
-#if defined(OPENSSL_X86_64) && defined(OQS_RUN_URANDOM_TESTS) && !defined(BORINGSSL_SHARED_LIBRARY) && \
+#if defined(OPENSSL_X86_64) && !defined(BORINGSSL_SHARED_LIBRARY) && \
     !defined(BORINGSSL_UNSAFE_DETERMINISTIC_MODE) && defined(USE_NR_getrandom)
 
 #include <linux/random.h>
@@ -420,8 +420,7 @@ static std::vector<Event> TestFunctionPRNGModel(unsigned flags) {
   if (!have_rdrand()) {
     if ((!have_fork_detection() && !sysrand(true, kAdditionalDataLength)) ||
         // Initialise CRNGT.
-        (is_fips && !sysrand(true, 16)) ||
-        !sysrand(true, kSeedLength) ||
+        !sysrand(true, kSeedLength + (is_fips ? 16 : 0)) ||
         // Second entropy draw.
         (!have_fork_detection() && !sysrand(true, kAdditionalDataLength))) {
       return ret;

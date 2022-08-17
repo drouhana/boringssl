@@ -156,9 +156,7 @@ static int rsa_opaque(const EVP_PKEY *pkey) {
   return RSA_is_opaque(pkey->pkey.rsa);
 }
 
-// OQS note: We have renamed this from "int_rsa_size"
-// to "size_t_rsa_size"
-static size_t size_t_rsa_size(const EVP_PKEY *pkey) {
+static int int_rsa_size(const EVP_PKEY *pkey) {
   return RSA_size(pkey->pkey.rsa);
 }
 
@@ -172,6 +170,8 @@ const EVP_PKEY_ASN1_METHOD rsa_asn1_meth = {
   EVP_PKEY_RSA,
   // 1.2.840.113549.1.1.1
   {0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01}, 9,
+
+  &rsa_pkey_meth,
 
   rsa_pub_decode,
   rsa_pub_encode,
@@ -187,7 +187,7 @@ const EVP_PKEY_ASN1_METHOD rsa_asn1_meth = {
 
   rsa_opaque,
 
-  size_t_rsa_size,
+  int_rsa_size,
   rsa_bits,
 
   0,0,0,
