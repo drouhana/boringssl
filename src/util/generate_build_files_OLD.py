@@ -859,7 +859,7 @@ def main(platforms):
   crypto_c_files = (FindCFiles(os.path.join('src', 'crypto'), NoTestsNorFIPSFragments) +
                     FindCFiles(os.path.join('src', 'third_party', 'fiat'), NoTestsNorFIPSFragments))
   fips_fragments = FindCFiles(os.path.join('src', 'crypto', 'fipsmodule'), OnlyFIPSFragments)
-  
+
   oqs_source_files = FindCFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
   oqs_fragments = FindCFiles(os.path.join('src', 'oqs_template'), AllFiles)
   
@@ -936,7 +936,7 @@ def main(platforms):
 
   ssl_internal_h_files = FindHeaderFiles(os.path.join('src', 'ssl'), NoTests)
   oqs_internal_h_files = FindHeaderFiles(os.path.join('src', 'oqs', 'include', 'oqs'), NoTests)
-  
+
   crypto_internal_h_files = (
       FindHeaderFiles(os.path.join('src', 'crypto'), NoTests) +
       FindHeaderFiles(os.path.join('src', 'third_party', 'fiat'), NoTests))
@@ -950,7 +950,7 @@ def main(platforms):
       'crypto_test_data': sorted('src/' + x for x in cmake['CRYPTO_TEST_DATA']),
       'fips_fragments': fips_fragments,
       'fuzz': fuzz_c_files,
-      
+
       # values added for oqs library
       'oqs': oqs_source_files,
       'oqs_headers': oqs_h_files,
