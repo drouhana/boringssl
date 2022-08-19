@@ -188,7 +188,7 @@ cc_library(
         "src/oqs/include",
         ],
     visibility = ["//visibility:public"],
-    #linkstatic = True,
+    linkstatic = True,
     deps = [
         ":crypto",
     ],
