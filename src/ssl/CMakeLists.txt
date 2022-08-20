@@ -35,12 +35,12 @@ add_library(
   ssl_versions.cc
   ssl_x509.cc
   t1_enc.cc
-  tls_method.cc
-  tls_record.cc
   tls13_both.cc
   tls13_client.cc
   tls13_enc.cc
   tls13_server.cc
+  tls_method.cc
+  tls_record.cc
 )
 
 add_dependencies(ssl global_target)

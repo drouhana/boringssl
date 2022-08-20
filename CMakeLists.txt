@@ -124,7 +124,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 include_directories(src/include)
-include_directories(src/oqs)
+include_directories(${LIBOQS_DIR})
 
 set(
   CRYPTO_apple_aarch64_SOURCES
@@ -651,7 +651,7 @@ add_executable(
   src/tool/transport_common.cc
 )
 
-target_link_libraries(bssl ssl crypto)
+target_link_libraries(bssl ssl crypto ${LIBOQS})
 
 if(NOT WIN32 AND NOT ANDROID)
   target_link_libraries(crypto pthread)

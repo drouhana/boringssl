@@ -268,26 +268,26 @@ add_library(
   cpu_aarch64_fuchsia.c
   cpu_aarch64_linux.c
   cpu_aarch64_win.c
-  cpu_arm_linux.c
   cpu_arm.c
+  cpu_arm_linux.c
   cpu_intel.c
   cpu_ppc64le.c
   crypto.c
   curve25519/curve25519.c
   curve25519/spake25519.c
-  dh_extra/params.c
   dh_extra/dh_asn1.c
+  dh_extra/params.c
   digest_extra/digest_extra.c
   dsa/dsa.c
   dsa/dsa_asn1.c
-  ecdh_extra/ecdh_extra.c
-  ecdsa_extra/ecdsa_asn1.c
   ec_extra/ec_asn1.c
   ec_extra/ec_derive.c
   ec_extra/hash_to_curve.c
+  ecdh_extra/ecdh_extra.c
+  ecdsa_extra/ecdsa_asn1.c
+  engine/engine.c
   err/err.c
   err_data.c
-  engine/engine.c
   evp/digestsign.c
   evp/evp.c
   evp/evp_asn1.c
@@ -297,17 +297,19 @@ add_library(
   evp/p_ec_asn1.c
   evp/p_ed25519.c
   evp/p_ed25519_asn1.c
+  evp/p_oqs.c
+  evp/p_oqs_asn1.c
   evp/p_rsa.c
   evp/p_rsa_asn1.c
   evp/p_x25519.c
   evp/p_x25519_asn1.c
-  evp/p_oqs.c
-  evp/p_oqs_asn1.c
   evp/pbkdf.c
   evp/print.c
   evp/scrypt.c
   evp/sign.c
   ex_data.c
+  fipsmodule/bcm.c
+  fipsmodule/fips_shared_support.c
   hkdf/hkdf.c
   hpke/hpke.c
   hrss/hrss.c
@@ -325,9 +327,9 @@ add_library(
   pem/pem_xaux.c
   pkcs7/pkcs7.c
   pkcs7/pkcs7_x509.c
+  pkcs8/p5_pbev2.c
   pkcs8/pkcs8.c
   pkcs8/pkcs8_x509.c
-  pkcs8/p5_pbev2.c
   poly1305/poly1305.c
   poly1305/poly1305_arm.c
   poly1305/poly1305_vec.c
@@ -343,8 +345,8 @@ add_library(
   refcount_lock.c
   rsa_extra/rsa_asn1.c
   rsa_extra/rsa_print.c
-  stack/stack.c
   siphash/siphash.c
+  stack/stack.c
   thread.c
   thread_none.c
   thread_pthread.c
@@ -494,6 +496,7 @@ add_dependencies(all_tests urandom_test)
 add_executable(
   crypto_test
 
+  crypto_test_data.cc
   abi_self_test.cc
   asn1/asn1_test.cc
   base64/base64_test.cc
@@ -513,10 +516,10 @@ add_executable(
   curve25519/ed25519_test.cc
   curve25519/spake25519_test.cc
   curve25519/x25519_test.cc
-  ecdh_extra/ecdh_test.cc
   dh_extra/dh_test.cc
   digest_extra/digest_test.cc
   dsa/dsa_test.cc
+  ecdh_extra/ecdh_test.cc
   err/err_test.cc
   evp/evp_extra_test.cc
   evp/evp_test.cc
@@ -533,25 +536,27 @@ add_executable(
   fipsmodule/rand/fork_detect_test.cc
   fipsmodule/sha/sha_test.cc
   hkdf/hkdf_test.cc
-  hpke/hpke_test.cc
   hmac_extra/hmac_test.cc
+  hpke/hpke_test.cc
   hrss/hrss_test.cc
   impl_dispatch_test.cc
   lhash/lhash_test.cc
   obj/obj_test.cc
   pem/pem_test.cc
   pkcs7/pkcs7_test.cc
-  pkcs8/pkcs8_test.cc
   pkcs8/pkcs12_test.cc
+  pkcs8/pkcs8_test.cc
   poly1305/poly1305_test.cc
   pool/pool_test.cc
   rand_extra/rand_test.cc
   refcount_test.cc
   rsa_extra/rsa_test.cc
   self_test.cc
-  stack/stack_test.cc
   siphash/siphash_test.cc
+  stack/stack_test.cc
+  test/abi_test.cc
   test/file_test_gtest.cc
+  test/gtest_main.cc
   thread_test.cc
   trust_token/trust_token_test.cc
   x509/x509_test.cc
