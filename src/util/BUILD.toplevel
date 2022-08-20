@@ -112,7 +112,9 @@ linux_copts = posix_copts + [
 boringssl_copts = select({
     "@platforms//os:linux": linux_copts,
     "@platforms//os:macos": posix_copts,
-    "@platforms//os:windows": ["-DWIN32_LEAN_AND_MEAN"],
+    "@platforms//os:windows": [
+        "-DWIN32_LEAN_AND_MEAN",
+        "-DBORINGSSL_IMPLEMENTATION",],
     "//conditions:default": [],
 })
 
@@ -148,7 +150,7 @@ boringssl_copts_c11 = boringssl_copts + select({
     "//conditions:default": [],
 })
 
-# For C++ targets only (not C), compile with C++14 support.
+# For C++ targets only (not C), compile with C++11 support.
 posix_copts_cxx = [
     "-std=c++11",
     "-Wmissing-declarations",
@@ -177,7 +179,7 @@ cc_library(
         "@platforms//os:windows": ["-defaultlib:advapi32.lib"],
         "//conditions:default": ["-lpthread"],
     }),
-    #linkstatic = True,
+    linkstatic = True,
     visibility = ["//visibility:public"],
 )
 
@@ -191,7 +193,7 @@ cc_library(
         "src/oqs/include",
         ],
     visibility = ["//visibility:public"],
-    #linkstatic = True,
+    linkstatic = True,
     deps = [
         ":crypto",
     ],

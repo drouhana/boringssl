@@ -199,5 +199,7 @@ cc_binary(
     srcs = tool_sources + tool_headers,
     copts = boringssl_copts_cxx,
     visibility = ["//visibility:public"],
-    deps = [":ssl"],
+    deps = [
+        ":ssl",
+    ],
 )
