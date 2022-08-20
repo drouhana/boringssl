@@ -59,8 +59,8 @@ add_executable(
 
 add_dependencies(ssl_test global_target)
 
-target_link_libraries(ssl_test test_support_lib boringssl_gtest ssl crypto)
+target_link_libraries(ssl_test test_support_lib boringssl_gtest ssl crypto ${LIBOQS})
 if(WIN32)
-  target_link_libraries(ssl_test ws2_32)
+  target_link_libraries(ssl_test ws2_32 ${LIBOQS})
 endif()
 add_dependencies(all_tests ssl_test)

@@ -1,4 +1,5 @@
 include_directories(../include)
+include_directories(${LIBOQS_DIR}/include)
 
 add_executable(
   bssl

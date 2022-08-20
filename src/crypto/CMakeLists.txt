@@ -469,13 +469,13 @@ endif()
 SET_TARGET_PROPERTIES(crypto PROPERTIES LINKER_LANGUAGE C)
 
 if(NOT WIN32 AND NOT ANDROID)
-  target_link_libraries(crypto pthread)
+  target_link_libraries(crypto pthread ${LIBOQS})
 endif()
 
 # Every target depends on crypto, so we add libcxx as a dependency here to
 # simplify injecting it everywhere.
 if(USE_CUSTOM_LIBCXX)
-  target_link_libraries(crypto libcxx)
+  target_link_libraries(crypto libcxx ${LIBOQS})
 endif()
 target_link_libraries(crypto ${LIBOQS})
 
@@ -488,7 +488,7 @@ add_executable(
   fipsmodule/rand/urandom_test.cc
 )
 
-target_link_libraries(urandom_test test_support_lib boringssl_gtest crypto)
+target_link_libraries(urandom_test test_support_lib boringssl_gtest crypto ${LIBOQS})
 
 add_dependencies(urandom_test global_target)
 add_dependencies(all_tests urandom_test)
@@ -569,8 +569,8 @@ add_executable(
 
 add_dependencies(crypto_test global_target)
 
-target_link_libraries(crypto_test test_support_lib boringssl_gtest crypto)
+target_link_libraries(crypto_test test_support_lib boringssl_gtest crypto ${LIBOQS})
 if(WIN32)
-  target_link_libraries(crypto_test ws2_32)
+  target_link_libraries(crypto_test ws2_32 ${LIBOQS})
 endif()
 add_dependencies(all_tests crypto_test)

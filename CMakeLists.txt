@@ -124,7 +124,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 include_directories(src/include)
-include_directories(${LIBOQS_DIR})
+include_directories(${LIBOQS_DIR}/include)
 
 set(
   CRYPTO_apple_aarch64_SOURCES
