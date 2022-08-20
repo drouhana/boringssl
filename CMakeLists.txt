@@ -124,6 +124,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 include_directories(src/include)
+include_directories(src/oqs)
 
 set(
   CRYPTO_apple_aarch64_SOURCES
