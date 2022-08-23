@@ -31,10 +31,6 @@
 extern "C" {
 #endif
 
-#ifdef DANIEL_DEBUG
-#error
-#endif
-
 /** Algorithm identifier for BIKE-L1 KEM (Round-3). */
 #define OQS_KEM_alg_bike_l1 "BIKE-L1"
 /** Algorithm identifier for BIKE-L3 KEM (Round-3). */
