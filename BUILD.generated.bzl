@@ -523,6 +523,7 @@ tool_headers = [
 ]
 
 oqs_sources = [
+    "src/oqs/lib/liboqs.a"
 ]
 
 oqs_headers = [
