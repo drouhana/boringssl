@@ -16,6 +16,7 @@
 
 #include <openssl/err.h>
 #include <openssl/mem.h>
+#define DANIEL_DEBUG
 #include <oqs/oqs.h>
 
 #include "internal.h"
